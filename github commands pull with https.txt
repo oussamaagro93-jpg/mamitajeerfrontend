@@ -1,0 +1,7 @@
+
+
+git remote set-url origin https://github.com/alasqlto62/store4frontend.git
+git fetch origin
+git stash
+git pull origin main
+

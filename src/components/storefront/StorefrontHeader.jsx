@@ -1,0 +1,93 @@
+import React from 'react';
+import { connect } from 'react-redux';
+import { withTranslation } from 'react-i18next';
+import { Bars3Icon, MagnifyingGlassIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import { LANGUAGES, languageSlice } from '../../store/languageSlice';
+
+class StorefrontHeader extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { langOpen: false };
+  }
+
+  handleLanguageChange(code) {
+    this.props.dispatch(languageSlice.setLanguage(code));
+    this.setState({ langOpen: false });
+  }
+
+  render() {
+    var t = this.props.t;
+    var currentLang = this.props.language;
+    var onMenuToggle = this.props.onMenuToggle || function () {};
+    var onSearchToggle = this.props.onSearchToggle || function () {};
+
+    return React.createElement('header', {
+      className: 'sticky top-0 z-40 bg-gradient-to-r from-[#5B21B6] to-[#6C3DF2] shadow-lg',
+    },
+      React.createElement('div', { className: 'flex items-center justify-between px-4 py-3 max-w-7xl mx-auto' },
+
+        React.createElement('button', {
+          onClick: onMenuToggle,
+          className: 'p-2 text-white hover:bg-white/10 rounded-full transition-colors',
+          'aria-label': t('storefront.header.menu'),
+        },
+          React.createElement(Bars3Icon, { className: 'w-6 h-6' })
+        ),
+
+        React.createElement('div', {
+          onClick: this.props.onLogoClick || function () { window.location.href = '/'; },
+          className: 'flex items-center space-x-2 cursor-pointer',
+        },
+          React.createElement('div', {
+            className: 'w-9 h-9 bg-white rounded-xl flex items-center justify-center',
+          },
+            React.createElement('span', { className: 'text-sm font-bold text-[#6C3DF2]' }, t('app.logo'))
+          ),
+          React.createElement('span', { className: 'text-lg font-bold text-white' }, t('app.name'))
+        ),
+
+        React.createElement('div', { className: 'flex items-center space-x-1' },
+          // Language Switcher
+          React.createElement('div', { className: 'relative' },
+            React.createElement('button', {
+              onClick: function () { this.setState({ langOpen: !this.state.langOpen }); }.bind(this),
+              className: 'p-2 text-white hover:bg-white/10 rounded-full transition-colors',
+              'aria-label': t('storefront.header.language'),
+            },
+              React.createElement(GlobeAltIcon, { className: 'w-6 h-6' })
+            ),
+            this.state.langOpen && React.createElement('div', {
+              className: 'absolute top-full right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden min-w-[140px] z-50',
+            },
+              LANGUAGES.map(function (lang) {
+                return React.createElement('button', {
+                  key: lang.code,
+                  onClick: function () { this.handleLanguageChange(lang.code); }.bind(this),
+                  className: 'w-full px-4 py-2.5 text-sm text-left hover:bg-gray-50 transition-colors flex items-center space-x-2 ' + (currentLang === lang.code ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700'),
+                },
+                  React.createElement('span', { className: 'text-base' }, lang.code === 'ar' ? '\u0639' : lang.code === 'fr' ? 'F' : 'E'),
+                  React.createElement('span', null, lang.label)
+                );
+              }.bind(this))
+            )
+          ),
+
+          React.createElement('button', {
+            onClick: onSearchToggle,
+            className: 'p-2 text-white hover:bg-white/10 rounded-full transition-colors',
+            'aria-label': t('storefront.header.search'),
+          },
+            React.createElement(MagnifyingGlassIcon, { className: 'w-6 h-6' })
+          )
+        )
+      )
+    );
+  }
+}
+
+function mapStateToProps(state) {
+  return { language: state.language.code };
+}
+
+var ConnectedHeader = connect(mapStateToProps)(StorefrontHeader);
+export default withTranslation()(ConnectedHeader);
