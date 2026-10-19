@@ -1,0 +1,2 @@
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+npm run dev
