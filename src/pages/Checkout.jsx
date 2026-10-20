@@ -270,10 +270,13 @@ class Checkout extends React.Component {
                   React.createElement('select', {
                     value: form.wilayaId,
                     onChange: function (e) {
-                      var wilaya = wilayas.find(function (w) { return w.id === e.target.value; });
+                      var value = e.target.value;
+                      var wilaya = wilayas.find(function (w) { return String(w.id) === String(value); });
                       self.handleFormChange({
-                        wilayaId: e.target.value,
-                        guestWilaya: wilaya ? wilaya.nameFr : '',
+                        wilayaId: value,
+                        guestWilaya: wilaya ? (wilaya.nameFr || wilaya.name) : '',
+                        communeId: '',
+                        guestCity: '',
                       });
                     },
                     className: 'w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#6C3DF2]/40 focus:border-[#6C3DF2] transition-colors bg-white',
@@ -292,10 +295,11 @@ class Checkout extends React.Component {
                   React.createElement('select', {
                     value: form.communeId,
                     onChange: function (e) {
-                      var commune = communes.find(function (c) { return c.id === e.target.value; });
+                      var value = e.target.value;
+                      var commune = communes.find(function (c) { return String(c.id) === String(value); });
                       self.handleFormChange({
-                        communeId: e.target.value,
-                        guestCity: commune ? commune.nameFr : '',
+                        communeId: value,
+                        guestCity: commune ? (commune.nameFr || commune.name) : '',
                       });
                     },
                     className: 'w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#6C3DF2]/40 focus:border-[#6C3DF2] transition-colors bg-white',

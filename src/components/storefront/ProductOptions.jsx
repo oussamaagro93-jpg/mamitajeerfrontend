@@ -11,11 +11,6 @@ class ProductOptions extends React.Component {
 
     if (!product) return null;
 
-    var categoryOptions = [];
-    if (product.category) {
-      categoryOptions.push(React.createElement('option', { key: product.category.id, value: product.category.id }, product.category.name));
-    }
-
     var variantColors = [];
     var variantSizes = [];
     var otherOptions = [];
@@ -40,27 +35,12 @@ class ProductOptions extends React.Component {
       });
     }
 
-    var hasOptions = categoryOptions.length > 0 || variantColors.length > 0 || variantSizes.length > 0 || otherOptions.length > 0;
+    var hasOptions = variantColors.length > 0 || variantSizes.length > 0 || otherOptions.length > 0;
     if (!hasOptions) return null;
 
     var selectClass = 'w-full px-4 py-3 bg-white border-2 border-[#6C3DF2]/30 rounded-xl text-gray-700 text-base appearance-none cursor-pointer focus:outline-none focus:border-[#6C3DF2] focus:ring-2 focus:ring-[#6C3DF2]/20 transition-all';
 
     return React.createElement('div', { className: 'space-y-3' },
-      categoryOptions.length > 0 && React.createElement('div', null,
-        React.createElement('label', { className: 'block text-sm font-medium text-gray-500 mb-1.5' }, t('storefront.options.category')),
-        React.createElement('div', { className: 'relative' },
-          React.createElement('select', {
-            value: selected.categoryId || '',
-            onChange: function (e) { onChange('categoryId', e.target.value); },
-            className: selectClass,
-          },
-            React.createElement('option', { value: '' }, t('storefront.options.selectCategory')),
-            categoryOptions
-          ),
-          React.createElement(ChevronDownIcon, { className: 'absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none' })
-        )
-      ),
-
       variantColors.length > 0 && React.createElement('div', null,
         React.createElement('label', { className: 'block text-sm font-medium text-gray-500 mb-1.5' }, t('storefront.options.color')),
         React.createElement('div', { className: 'flex flex-wrap gap-2' },

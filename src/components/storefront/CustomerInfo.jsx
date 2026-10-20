@@ -13,7 +13,7 @@ class CustomerInfo extends React.Component {
   handleWilayaChange(e) {
     var value = e.target.value;
     var wilayas = this.props.wilayas || [];
-    var wilaya = wilayas.find(function (w) { return w.id === value; });
+    var wilaya = wilayas.find(function (w) { return String(w.id) === String(value); });
     this.props.onChange({
       wilayaId: value,
       guestWilaya: wilaya ? (wilaya.nameFr || wilaya.name) : '',
@@ -28,7 +28,7 @@ class CustomerInfo extends React.Component {
   handleCommuneChange(e) {
     var value = e.target.value;
     var communes = this.props.communes || [];
-    var commune = communes.find(function (c) { return c.id === value; });
+    var commune = communes.find(function (c) { return String(c.id) === String(value); });
     this.props.onChange({
       communeId: value,
       city: commune ? (commune.nameFr || commune.name) : '',
