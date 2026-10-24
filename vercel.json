@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://tajeer-backend.vercel.app/api/:path*"
+      "destination": "https://mamitajeerb.vercel.app/api/:path*"
     },
     {
       "source": "/(.*)",
