@@ -50,7 +50,20 @@
     "wellSendResetLink": "Nous vous enverrons un lien de réinitialisation",
     "checkEmailForReset": "Vérifiez vos e-mails pour le lien de réinitialisation.",
     "backToLogin": "Retour à la connexion",
-    "resetLinkSent": "Lien de réinitialisation envoyé à votre e-mail"
+    "resetLinkSent": "Lien de réinitialisation envoyé à votre e-mail",
+    "accountCreated": "Compte créé avec succès. Veuillez vous connecter.",
+    "invalidCredentials": "E-mail ou mot de passe invalide",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "registrationFailed": "?chec de l'inscription",
+    "requestFailed": "La demande a ?chou?. Veuillez r?essayer.",
+    "resetPasswordTitle": "Choisir un nouveau mot de passe",
+    "resetPasswordSubtitle": "Saisissez et confirmez votre nouveau mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "resetPasswordButton": "R?initialiser le mot de passe",
+    "resetting": "R?initialisation...",
+    "resetSuccess": "Mot de passe mis ? jour. Veuillez vous connecter.",
+    "invalidResetToken": "Ce lien de r?initialisation est invalide ou expir?.",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 6 caract?res"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -89,6 +102,8 @@
     "selectCategory": "Sélectionnez une catégorie",
     "brand": "Marque",
     "selectBrand": "Sélectionnez une marque",
+    "deliveryCompany": "Société de livraison",
+    "selectDeliveryCompany": "Sélectionner la société de livraison",
     "price": "Prix *",
     "comparePrice": "Prix comparé",
     "costPrice": "Prix de revient",
@@ -218,7 +233,8 @@
     "skuQty": "SKU : {{sku}} | Qté : {{qty}}",
     "deleteTitle": "Supprimer la commande",
     "deleteConfirm": "Êtes-vous sûr de vouloir supprimer la commande {{orderNumber}} ? Cette action est irréversible.",
-    "deleted": "Commande supprimée"
+    "deleted": "Commande supprimée",
+    "coupon": "Code promo"
   },
   "customers": {
     "title": "Clients",
@@ -300,7 +316,22 @@
       "value": "Valeur",
       "used": "Utilisé",
       "status": "Statut"
-    }
+    },
+    "editCoupon": "Modifier le code promo",
+    "updated": "Code promo mis ? jour",
+    "percentageValue": "Pourcentage (%)",
+    "fixedValue": "Montant (DA)",
+    "minOrderAmount": "Montant minimum de commande (DA)",
+    "maxDiscountAmount": "R?duction maximale (DA, facultatif)",
+    "usageLimit": "Limite d'utilisation totale (facultatif)",
+    "perUserLimit": "Limite par client",
+    "unlimited": "Illimit?",
+    "startDate": "Date de d?but",
+    "endDate": "Date de fin",
+    "products": "Limiter aux produits (facultatif)",
+    "categories": "Limiter aux cat?gories (facultatif)",
+    "restrictionsHint": "Laissez vide pour appliquer ? tout le panier. Maintenez Ctrl/Cmd pour s?lectionner plusieurs ?l?ments.",
+    "description": "Description"
   },
   "users": {
     "title": "Utilisateurs",
@@ -617,7 +648,12 @@
     "city": "Ville / Commune",
     "cityPlaceholder": "Entrez votre ville ou commune",
     "deliveryMethod": "Mode de livraison",
+    "homeDelivery": "Livraison à domicile",
+    "deskDelivery": "Livraison au bureau",
+    "selectWilayaForDelivery": "Sélectionnez votre wilaya pour voir les prix de livraison",
+    "notAvailable": "Non disponible",
     "selectDelivery": "Veuillez sélectionner un mode de livraison",
+    "deliveryUnavailable": "La livraison n'est pas disponible pour la destination sélectionnée",
     "days": "jours",
     "address": "Adresse complète",
     "addressPlaceholder": "Rue, numéro, point de repère...",
@@ -641,8 +677,24 @@
       "step1": "Nous examinerons votre commande prochainement",
       "step2": "Nous vous contacterons pour confirmer les détails de livraison",
       "step3": "Votre commande sera livrée à votre adresse",
-      "continueShopping": "Continuer les achats"
-    }
+      "continueShopping": "Continuer les achats",
+      "discoverTitle": "Découvrez plus de produits",
+      "discoverSubtitle": "Plus d'articles de la même catégorie que votre achat",
+      "discoverCategory": "Plus d'articles dans {{category}}",
+      "noMoreProducts": "Il n'y a pas d'autres produits dans cette catégorie pour le moment."
+    },
+    "coupon": "Code promo",
+    "couponPlaceholder": "Entrez le code promo",
+    "applyCoupon": "Appliquer",
+    "applyingCoupon": "Application...",
+    "removeCoupon": "Retirer",
+    "couponApplied": "Code promo {{code}} appliqu?",
+    "couponAppliedShort": "Code promo {{code}} appliqu?",
+    "couponDiscount": "{{amount}} DA de r?duction",
+    "couponFreeShipping": "Livraison gratuite appliqu?e",
+    "couponRequired": "Entrez un code promo",
+    "couponInvalid": "Code promo invalide",
+    "discount": "Remise"
   },
   "errors": {
     "notFound": {

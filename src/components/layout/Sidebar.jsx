@@ -32,6 +32,7 @@ class Sidebar extends React.Component {
         href: "/admin",
         icon: HomeIcon,
         badge: "📊",
+        permission: "dashboard.view",
       },
       {
         name: t("nav.products"),
@@ -39,6 +40,7 @@ class Sidebar extends React.Component {
         href: "/admin/products",
         icon: CubeIcon,
         badge: "📦",
+        permission: "products.view",
       },
       {
         name: t("nav.categories"),
@@ -46,6 +48,7 @@ class Sidebar extends React.Component {
         href: "/admin/categories",
         icon: TagIcon,
         badge: "🏷️",
+        permission: "categories.view",
       },
       {
         name: t("nav.brands"),
@@ -53,6 +56,7 @@ class Sidebar extends React.Component {
         href: "/admin/brands",
         icon: BuildingStorefrontIcon,
         badge: "🏪",
+        permission: "brands.view",
       },
       {
         name: t("nav.orders"),
@@ -60,6 +64,7 @@ class Sidebar extends React.Component {
         href: "/admin/orders",
         icon: ShoppingCartIcon,
         badge: "🎁",
+        permission: "orders.view",
       },
       {
         name: t("nav.customers"),
@@ -67,6 +72,7 @@ class Sidebar extends React.Component {
         href: "/admin/customers",
         icon: UsersIcon,
         badge: "👥",
+        permission: "customers.view",
       },
       {
         name: t("nav.inventory"),
@@ -74,6 +80,7 @@ class Sidebar extends React.Component {
         href: "/admin/inventory",
         icon: ArchiveBoxIcon,
         badge: "🚚",
+        permission: "inventory.view",
       },
       {
         name: t("nav.coupons"),
@@ -81,6 +88,7 @@ class Sidebar extends React.Component {
         href: "/admin/coupons",
         icon: GiftIcon,
         badge: "🎟️",
+        permission: "coupons.view",
       },
     ];
 
@@ -89,7 +97,12 @@ class Sidebar extends React.Component {
       null,
       function (auth) {
         var user = auth ? auth.user : null;
-        var isSuperAdmin =
+        var permissions =
+          user && Array.isArray(user.permissions) ? user.permissions : [];
+        var can = function (permission) {
+          return permissions.indexOf(permission) !== -1;
+        };
+        var isAdmin =
           user && (user.role === "super_admin" || user.role === "admin");
         var open = this.props.open;
         var setOpen = this.props.setOpen;
@@ -204,11 +217,15 @@ class Sidebar extends React.Component {
             React.createElement(
               "nav",
               { className: "flex-1 px-3 py-4 space-y-1 overflow-y-auto" },
-              navigation.map(function (item) {
-                return createNavItem(item, item.href === "/admin");
-              }),
+              navigation
+                .filter(function (item) {
+                  return !item.permission || can(item.permission);
+                })
+                .map(function (item) {
+                  return createNavItem(item, item.href === "/admin");
+                }),
 
-              isSuperAdmin
+              isAdmin
                 ? React.createElement(
                     React.Fragment,
                     null,
@@ -241,7 +258,7 @@ class Sidebar extends React.Component {
                   )
                 : null,
 
-              isSuperAdmin
+              can("users.view")
                 ? createNavItem({
                     name: t("nav.users"),
                     href: "/admin/users",
@@ -252,19 +269,21 @@ class Sidebar extends React.Component {
             ),
 
             // Settings Section
-            React.createElement(
-              "div",
-              {
-                className:
-                  "px-3 py-2 border-t border-gray-200 dark:border-gray-700",
-              },
-              createNavItem({
-                name: t("nav.settings"),
-                href: "/admin/settings",
-                icon: Cog6ToothIcon,
-                badge: "🔑",
-              }),
-            ),
+            can("settings.view")
+              ? React.createElement(
+                  "div",
+                  {
+                    className:
+                      "px-3 py-2 border-t border-gray-200 dark:border-gray-700",
+                  },
+                  createNavItem({
+                    name: t("nav.settings"),
+                    href: "/admin/settings",
+                    icon: Cog6ToothIcon,
+                    badge: "🔑",
+                  }),
+                )
+              : null,
 
             // Bottom Collapse Menu Bar
             React.createElement(
@@ -291,7 +310,9 @@ class Sidebar extends React.Component {
                   className:
                     "w-7 h-7 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 flex items-center justify-center text-xs font-bold",
                 },
-                user && user.name ? user.name.charAt(0).toUpperCase() : "A",
+                user && (user.firstName || user.name)
+                  ? (user.firstName || user.name).charAt(0).toUpperCase()
+                  : "A",
               ),
             ),
           ),

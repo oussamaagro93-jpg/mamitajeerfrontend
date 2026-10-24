@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
+import { notify } from '../components/common/Toast';
 
 class Register extends React.Component {
   constructor(props) {
@@ -11,7 +12,11 @@ class Register extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    if (this.state.form.password !== this.state.form.confirmPassword) return;
+    var t = this.props.t;
+    if (this.state.form.password !== this.state.form.confirmPassword) {
+      notify(t('auth.passwordsDoNotMatch'), 'error');
+      return;
+    }
     this.setState({ loading: true });
     var self = this;
     this.context.register({
@@ -19,15 +24,16 @@ class Register extends React.Component {
       lastName: self.state.form.lastName,
       email: self.state.form.email,
       password: self.state.form.password,
-    }).then(function (res) {
-      var role = res.data.user.role;
-      if (['super_admin', 'admin', 'manager', 'employee'].includes(role)) {
-        self.props.history.push('/admin');
-      } else {
-        self.props.history.push('/');
-      }
-    }).catch(function () {
+    }).then(function () {
+      // Account created: send the user to sign in with their email prefilled.
+      self.props.history.push({
+        pathname: '/login',
+        state: { email: self.state.form.email, registered: true },
+      });
+    }).catch(function (err) {
+      var message = (err.response && err.response.data && err.response.data.message) || t('auth.registrationFailed');
       self.setState({ loading: false });
+      notify(message, 'error');
     });
   }
 

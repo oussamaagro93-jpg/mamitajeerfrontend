@@ -13,6 +13,7 @@ import {
   CheckIcon,
 } from '@heroicons/react/24/outline';
 import { ThemeContext } from '../context/ThemeContext';
+import { AuthContext } from '../context/AuthContext';
 
 var BRAND_COLOR = '#6C3DF2';
 
@@ -59,6 +60,7 @@ class Landing extends React.Component {
     var t = this.props.t;
     var lang = this.props.language;
     var products = this.state.featuredProducts;
+    var user = this.context ? this.context.user : null;
 
     return React.createElement(ThemeContext.Consumer, null, function (theme) {
       return React.createElement('div', { className: 'min-h-screen bg-white dark:bg-gray-900 transition-colors' },
@@ -315,28 +317,40 @@ class Landing extends React.Component {
                   )
               ),
 
-              // Login
-              React.createElement(
-                Link,
-                {
-                  to: '/login',
-                  className:
-                    'hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors',
-                },
-                t('auth.signIn')
-              ),
+              // Signed-in customers see Sign Out instead of Sign In / Get Started
+              user
+                ? React.createElement(
+                    'button',
+                    {
+                      onClick: function () {
+                        if (this.context) this.context.logout();
+                      }.bind(this),
+                      className:
+                        'hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors',
+                    },
+                    t('nav.signOut')
+                  )
+                : React.createElement(
+                    Link,
+                    {
+                      to: '/login',
+                      className:
+                        'hidden sm:inline-flex px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors',
+                    },
+                    t('auth.signIn')
+                  ),
 
-              // Get Started
-              React.createElement(
-                Link,
-                {
-                  to: '/register',
-                  className:
-                    'inline-flex items-center px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all hover:shadow-lg',
-                  style: { backgroundColor: BRAND_COLOR },
-                },
-                t('landing.hero.getStarted')
-              ),
+              !user &&
+                React.createElement(
+                  Link,
+                  {
+                    to: '/register',
+                    className:
+                      'inline-flex items-center px-4 py-2 text-sm font-semibold text-white rounded-xl transition-all hover:shadow-lg',
+                    style: { backgroundColor: BRAND_COLOR },
+                  },
+                  t('landing.hero.getStarted')
+                ),
 
               // Mobile hamburger
               React.createElement(
@@ -1339,5 +1353,7 @@ class Landing extends React.Component {
 function mapStateToProps(state) {
   return { language: state.language.code };
 }
+
+Landing.contextType = AuthContext;
 
 export default connect(mapStateToProps)(withTranslation()(Landing));

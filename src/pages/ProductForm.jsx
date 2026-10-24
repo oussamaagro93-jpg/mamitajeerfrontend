@@ -1,6 +1,7 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 import { productAPI, categoryAPI, brandAPI } from '../api';
+import { publicShippingAPI } from '../api/shipping';
 import { notify } from '../components/common/Toast';
 import { PhotoIcon, EyeIcon, ClipboardIcon, XMarkIcon, TrashIcon, StarIcon, ChevronUpIcon, ChevronDownIcon, PlusIcon, ShoppingBagIcon } from '@heroicons/react/24/outline';
 import ProductPicker from '../components/admin/ProductPicker';
@@ -16,9 +17,10 @@ class ProductForm extends React.Component {
       product: null,
       categories: [],
       brands: [],
+      deliveryCompanies: [],
       form: {
         name: '', sku: '', price: '', comparePrice: '', costPrice: '',
-        quantity: '', categoryId: '', brandId: '', description: '',
+        quantity: '', categoryId: '', brandId: '', deliveryCompanyId: '', description: '',
         shortDescription: '', status: 'draft', weight: '', vendor: '',
       },
       selectedFiles: [],
@@ -46,6 +48,7 @@ class ProductForm extends React.Component {
             quantity: p.quantity || '',
             categoryId: p.categoryId || '',
             brandId: p.brandId || '',
+            deliveryCompanyId: p.deliveryCompanyId || '',
             description: p.description || '',
             shortDescription: p.shortDescription || '',
             status: p.status || 'draft',
@@ -66,6 +69,9 @@ class ProductForm extends React.Component {
     }).catch(function () {});
     brandAPI.getAll({ limit: 100 }).then(function (res) {
       self.setState({ brands: res.data.data.brands || [] });
+    }).catch(function () {});
+    publicShippingAPI.getDeliveryCompanies().then(function (res) {
+      self.setState({ deliveryCompanies: res.data.data.companies || [] });
     }).catch(function () {});
   }
 
@@ -284,6 +290,7 @@ class ProductForm extends React.Component {
     var form = this.state.form;
     var categories = this.state.categories;
     var brands = this.state.brands;
+    var deliveryCompanies = this.state.deliveryCompanies;
     var product = this.state.product;
     var images = (product && product.images) || [];
     var storefrontUrl = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_STOREFRONT_URL) || window.location.origin;
@@ -481,6 +488,13 @@ class ProductForm extends React.Component {
               React.createElement('select', { value: form.brandId, onChange: function (e) { this.handleChange('brandId', e.target.value); }.bind(this), className: 'input-field' },
                 React.createElement('option', { value: '' }, t('products.selectBrand')),
                 brands.map(function (b) { return React.createElement('option', { key: b.id, value: b.id }, b.name); })
+              )
+            ),
+            React.createElement('div', null,
+              React.createElement('label', { className: 'label' }, t('products.deliveryCompany')),
+              React.createElement('select', { value: form.deliveryCompanyId, onChange: function (e) { this.handleChange('deliveryCompanyId', e.target.value); }.bind(this), className: 'input-field' },
+                React.createElement('option', { value: '' }, t('products.selectDeliveryCompany')),
+                deliveryCompanies.map(function (company) { return React.createElement('option', { key: company.id, value: company.id }, company.name); })
               )
             ),
             React.createElement('div', null,

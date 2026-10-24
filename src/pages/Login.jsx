@@ -3,18 +3,27 @@ import { Link } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
+import { notify } from '../components/common/Toast';
 import { MoonIcon, SunIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 class Login extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { email: '', password: '', showPassword: false, loading: false };
+    var routeState = props.location && props.location.state;
+    this.state = {
+      email: (routeState && routeState.email) || '',
+      password: '',
+      showPassword: false,
+      loading: false,
+      registered: !!(routeState && routeState.registered),
+    };
   }
 
   handleSubmit(e) {
     e.preventDefault();
     this.setState({ loading: true });
-      var self = this;
+    var self = this;
+    var t = this.props.t;
     this.context.login(self.state.email, self.state.password).then(function (res) {
       var role = res.data.user.role;
       if (['super_admin', 'admin', 'manager', 'employee'].includes(role)) {
@@ -22,8 +31,10 @@ class Login extends React.Component {
       } else {
         self.props.history.push('/');
       }
-    }).catch(function () {
+    }).catch(function (err) {
+      var message = (err.response && err.response.data && err.response.data.message) || t('auth.invalidCredentials');
       self.setState({ loading: false });
+      notify(message, 'error');
     });
   }
 
@@ -44,6 +55,9 @@ class Login extends React.Component {
               React.createElement('p', { className: 'text-gray-500 dark:text-gray-400 mt-1' }, t('auth.signInToAccount'))
             ),
             React.createElement('div', { className: 'card p-8' },
+              this.state.registered && React.createElement('div', {
+                className: 'mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700',
+              }, t('auth.accountCreated')),
               React.createElement('form', { onSubmit: this.handleSubmit.bind(this), className: 'space-y-5' },
                 React.createElement('div', null,
                   React.createElement('label', { className: 'label' }, t('auth.email')),

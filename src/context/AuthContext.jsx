@@ -1,8 +1,22 @@
 import React from 'react';
+import axios from 'axios';
 import api from '../api/axios';
+import { API_BASE_URL } from '../api/config';
 
 var AuthContext = React.createContext(null);
 var AuthConsumer = AuthContext.Consumer;
+
+function isTokenExpired(token) {
+  if (!token) return true;
+  try {
+    var base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) base64 += '=';
+    var payload = JSON.parse(window.atob(base64));
+    return !payload.exp || payload.exp * 1000 <= Date.now();
+  } catch (e) {
+    return true;
+  }
+}
 
 class AuthProvider extends React.Component {
   constructor(props) {
@@ -15,18 +29,47 @@ class AuthProvider extends React.Component {
   }
 
   loadUser() {
-    var token = localStorage.getItem('accessToken');
-    if (!token) {
+    var self = this;
+    var accessToken = localStorage.getItem('accessToken');
+    var refreshToken = localStorage.getItem('refreshToken');
+
+    var clearAuth = function () {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      self.setState({ user: null, loading: false });
+    };
+
+    var fetchProfile = function () {
+      return api.get('/auth/profile').then(function (res) {
+        self.setState({ user: res.data.data.user, loading: false });
+      }).catch(clearAuth);
+    };
+
+    if (!accessToken && !refreshToken) {
       this.setState({ loading: false });
       return;
     }
-    api.get('/auth/profile').then(function (res) {
-      this.setState({ user: res.data.data.user, loading: false });
-    }.bind(this)).catch(function () {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      this.setState({ loading: false });
-    }.bind(this));
+
+    // A valid access token can be used immediately.
+    if (accessToken && !isTokenExpired(accessToken)) {
+      fetchProfile();
+      return;
+    }
+
+    // Refresh proactively so startup does not trigger a 401 on /auth/profile.
+    if (refreshToken && !isTokenExpired(refreshToken)) {
+      axios.post(API_BASE_URL + '/auth/refresh-token', { refreshToken: refreshToken })
+        .then(function (res) {
+          var tokens = res.data.data.tokens;
+          localStorage.setItem('accessToken', tokens.accessToken);
+          localStorage.setItem('refreshToken', tokens.refreshToken);
+          return fetchProfile();
+        })
+        .catch(clearAuth);
+      return;
+    }
+
+    clearAuth();
   }
 
   login(email, password) {
@@ -40,9 +83,11 @@ class AuthProvider extends React.Component {
 
   register(userData) {
     return api.post('/auth/register', userData).then(function (res) {
-      localStorage.setItem('accessToken', res.data.data.tokens.accessToken);
-      localStorage.setItem('refreshToken', res.data.data.tokens.refreshToken);
-      this.setState({ user: res.data.data.user });
+      // Registration does not start a session. The user is sent to the
+      // sign-in page, so make sure no stale session is left behind.
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      this.setState({ user: null });
       return res.data;
     }.bind(this));
   }

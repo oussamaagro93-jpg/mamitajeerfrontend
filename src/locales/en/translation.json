@@ -50,7 +50,20 @@
     "wellSendResetLink": "We'll send you a reset link",
     "checkEmailForReset": "Check your email for the reset link.",
     "backToLogin": "Back to login",
-    "resetLinkSent": "Reset link sent to your email"
+    "resetLinkSent": "Reset link sent to your email",
+    "accountCreated": "Account created successfully. Please sign in.",
+    "invalidCredentials": "Invalid email or password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "registrationFailed": "Registration failed",
+    "requestFailed": "Request failed. Please try again.",
+    "resetPasswordTitle": "Choose a new password",
+    "resetPasswordSubtitle": "Enter and confirm your new password",
+    "newPassword": "New password",
+    "resetPasswordButton": "Reset password",
+    "resetting": "Resetting...",
+    "resetSuccess": "Password updated. Please sign in.",
+    "invalidResetToken": "This reset link is invalid or has expired.",
+    "passwordTooShort": "Password must be at least 6 characters"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -89,6 +102,8 @@
     "selectCategory": "Select category",
     "brand": "Brand",
     "selectBrand": "Select brand",
+    "deliveryCompany": "Delivery Company",
+    "selectDeliveryCompany": "Select delivery company",
     "price": "Price *",
     "comparePrice": "Compare Price",
     "costPrice": "Cost Price",
@@ -229,7 +244,8 @@
     "skuQty": "SKU: {{sku}} | Qty: {{qty}}",
     "deleteTitle": "Delete Order",
     "deleteConfirm": "Are you sure you want to delete order {{orderNumber}}? This action cannot be undone.",
-    "deleted": "Order deleted"
+    "deleted": "Order deleted",
+    "coupon": "Coupon"
   },
   "customers": {
     "title": "Customers",
@@ -311,7 +327,22 @@
       "value": "Value",
       "used": "Used",
       "status": "Status"
-    }
+    },
+    "editCoupon": "Edit Coupon",
+    "updated": "Coupon updated",
+    "percentageValue": "Percentage (%)",
+    "fixedValue": "Amount (DA)",
+    "minOrderAmount": "Minimum order amount (DA)",
+    "maxDiscountAmount": "Maximum discount (DA, optional)",
+    "usageLimit": "Total usage limit (optional)",
+    "perUserLimit": "Per-customer limit",
+    "unlimited": "Unlimited",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "products": "Restrict to products (optional)",
+    "categories": "Restrict to categories (optional)",
+    "restrictionsHint": "Leave empty to apply to the whole cart. Hold Ctrl/Cmd to select multiple.",
+    "description": "Description"
   },
   "users": {
     "title": "Users",
@@ -628,7 +659,12 @@
     "city": "City / Commune",
     "cityPlaceholder": "Enter your city or commune",
     "deliveryMethod": "Delivery Method",
+    "homeDelivery": "Home Delivery",
+    "deskDelivery": "Desk Delivery",
+    "selectWilayaForDelivery": "Select your Wilaya to see delivery prices",
+    "notAvailable": "Not available",
     "selectDelivery": "Please select a delivery method",
+    "deliveryUnavailable": "Delivery is not available for the selected destination",
     "days": "days",
     "address": "Full Address",
     "addressPlaceholder": "Street, house number, landmark...",
@@ -652,8 +688,24 @@
       "step1": "We will review your order shortly",
       "step2": "We will contact you to confirm delivery details",
       "step3": "Your order will be delivered to your address",
-      "continueShopping": "Continue Shopping"
-    }
+      "continueShopping": "Continue Shopping",
+      "discoverTitle": "Discover more products",
+      "discoverSubtitle": "More items from the same category as your purchase",
+      "discoverCategory": "More items in {{category}}",
+      "noMoreProducts": "There are no more products in this category right now."
+    },
+    "coupon": "Coupon Code",
+    "couponPlaceholder": "Enter coupon code",
+    "applyCoupon": "Apply",
+    "applyingCoupon": "Applying...",
+    "removeCoupon": "Remove",
+    "couponApplied": "Coupon {{code}} applied",
+    "couponAppliedShort": "Coupon {{code}} applied",
+    "couponDiscount": "{{amount}} DA off",
+    "couponFreeShipping": "Free shipping applied",
+    "couponRequired": "Enter a coupon code",
+    "couponInvalid": "Invalid coupon code",
+    "discount": "Discount"
   },
   "errors": {
     "notFound": {

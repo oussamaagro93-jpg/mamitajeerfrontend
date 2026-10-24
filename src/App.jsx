@@ -7,11 +7,13 @@ import MetaPixel from './utils/pixel';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Storefront from './pages/Storefront';
 import Landing from './pages/Landing';
 import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
+import OrderComplete from './pages/OrderComplete';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import ProductForm from './pages/ProductForm';
@@ -71,10 +73,23 @@ class App extends React.Component {
         );
       }
 
+      var can = function (permission) {
+        return !!(user && Array.isArray(user.permissions) && user.permissions.indexOf(permission) !== -1);
+      };
+      var guarded = function (Component, permission) {
+        return function (routeProps) {
+          return can(permission)
+            ? React.createElement(Component, routeProps)
+            : React.createElement(Redirect, { to: '/403' });
+        };
+      };
+
       return React.createElement(Switch, null,
-        // Home page - redirect to admin if logged in, show landing otherwise
+        // Public storefront home. Staff are redirected to the admin dashboard.
         React.createElement(Route, { exact: true, path: '/', render: function () {
-          return user ? React.createElement(Redirect, { to: '/admin' }) : React.createElement(Landing);
+          return user && adminRoles.includes(user.role)
+            ? React.createElement(Redirect, { to: '/admin' })
+            : React.createElement(Landing);
         } }),
 
         // Public product detail page
@@ -83,6 +98,7 @@ class App extends React.Component {
         // Public checkout pages
         React.createElement(Route, { exact: true, path: '/checkout', component: Checkout }),
         React.createElement(Route, { exact: true, path: '/order-success/:orderNumber', component: OrderSuccess }),
+        React.createElement(Route, { exact: true, path: '/order-complete/:orderNumber', component: OrderComplete }),
 
         // Auth pages (redirect to home if already logged in)
         React.createElement(Route, { path: '/login', render: function (routeProps) {
@@ -94,32 +110,35 @@ class App extends React.Component {
         React.createElement(Route, { path: '/forgot-password', render: function () {
           return user ? React.createElement(Redirect, { to: '/' }) : React.createElement(ForgotPassword);
         } }),
+        React.createElement(Route, { path: '/reset-password/:token', component: ResetPassword }),
         React.createElement(Route, { path: '/403', component: Forbidden }),
 
         // Admin section (protected + role-gated)
         React.createElement(Route, { path: '/admin', render: function () {
           if (!user) return React.createElement(Redirect, { to: '/login' });
-          if (!adminRoles.includes(user.role)) return React.createElement(Redirect, { to: '/403' });
+          // Customers have no admin access; send them back to the storefront.
+          if (!adminRoles.includes(user.role)) return React.createElement(Redirect, { to: '/' });
           return React.createElement(AdminLayout, null,
             React.createElement(Switch, null,
-              React.createElement(Route, { exact: true, path: '/admin', component: Dashboard }),
-              React.createElement(Route, { exact: true, path: '/admin/products', component: Products }),
-              React.createElement(Route, { exact: true, path: '/admin/products/new', component: ProductForm }),
-              React.createElement(Route, { exact: true, path: '/admin/products/:id/edit', component: ProductForm }),
-              React.createElement(Route, { exact: true, path: '/admin/categories', component: Categories }),
-              React.createElement(Route, { exact: true, path: '/admin/brands', component: Brands }),
-              React.createElement(Route, { exact: true, path: '/admin/orders', component: Orders }),
-              React.createElement(Route, { exact: true, path: '/admin/orders/:id', component: OrderDetail }),
-              React.createElement(Route, { exact: true, path: '/admin/customers', component: Customers }),
-              React.createElement(Route, { exact: true, path: '/admin/customers/:id', component: CustomerDetail }),
-              React.createElement(Route, { exact: true, path: '/admin/inventory', component: Inventory }),
-              React.createElement(Route, { exact: true, path: '/admin/coupons', component: Coupons }),
-              React.createElement(Route, { exact: true, path: '/admin/users', render: function () {
-                if (!['super_admin', 'admin'].includes(user.role)) return React.createElement(Redirect, { to: '/403' });
-                return React.createElement(Users);
+              React.createElement(Route, { exact: true, path: '/admin', render: function (routeProps) {
+                if (can('dashboard.view')) return React.createElement(Dashboard, routeProps);
+                if (can('products.view')) return React.createElement(Redirect, { to: '/admin/products' });
+                return React.createElement(Redirect, { to: '/403' });
               } }),
+              React.createElement(Route, { exact: true, path: '/admin/products', render: guarded(Products, 'products.view') }),
+              React.createElement(Route, { exact: true, path: '/admin/products/new', render: guarded(ProductForm, 'products.create') }),
+              React.createElement(Route, { exact: true, path: '/admin/products/:id/edit', render: guarded(ProductForm, 'products.update') }),
+              React.createElement(Route, { exact: true, path: '/admin/categories', render: guarded(Categories, 'categories.view') }),
+              React.createElement(Route, { exact: true, path: '/admin/brands', render: guarded(Brands, 'brands.view') }),
+              React.createElement(Route, { exact: true, path: '/admin/orders', render: guarded(Orders, 'orders.view') }),
+              React.createElement(Route, { exact: true, path: '/admin/orders/:id', render: guarded(OrderDetail, 'orders.view') }),
+              React.createElement(Route, { exact: true, path: '/admin/customers', render: guarded(Customers, 'customers.view') }),
+              React.createElement(Route, { exact: true, path: '/admin/customers/:id', render: guarded(CustomerDetail, 'customers.view') }),
+              React.createElement(Route, { exact: true, path: '/admin/inventory', render: guarded(Inventory, 'inventory.view') }),
+              React.createElement(Route, { exact: true, path: '/admin/coupons', render: guarded(Coupons, 'coupons.view') }),
+              React.createElement(Route, { exact: true, path: '/admin/users', render: guarded(Users, 'users.view') }),
               React.createElement(Route, { exact: true, path: '/admin/profile', component: Profile }),
-              React.createElement(Route, { exact: true, path: '/admin/settings', component: Settings }),
+              React.createElement(Route, { exact: true, path: '/admin/settings', render: guarded(Settings, 'settings.view') }),
               React.createElement(Route, { exact: true, path: '/admin/shipping/companies', render: function () {
                 if (!['super_admin', 'admin'].includes(user.role)) return React.createElement(Redirect, { to: '/403' });
                 return React.createElement(DeliveryCompanies);

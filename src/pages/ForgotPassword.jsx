@@ -17,8 +17,10 @@ class ForgotPassword extends React.Component {
     authAPI.forgotPassword(this.state.email).then(function () {
       self.setState({ sent: true, loading: false });
       notify(self.props.t('auth.resetLinkSent'));
-    }).catch(function () {
+    }).catch(function (err) {
+      var message = (err.response && err.response.data && err.response.data.message) || self.props.t('auth.requestFailed');
       self.setState({ loading: false });
+      notify(message, 'error');
     });
   }
 
