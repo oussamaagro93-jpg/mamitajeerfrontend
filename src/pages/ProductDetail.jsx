@@ -1,9 +1,9 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { productAPI } from '../api';
 import MetaPixel from '../utils/pixel';
-import { LANGUAGES, languageSlice } from '../store/languageSlice';
-import { store } from '../store';
+import { getWhatsappNumber } from '../utils/storeContacts';
 import StorefrontHeader from '../components/storefront/StorefrontHeader';
 import ProductCard from '../components/storefront/ProductCard';
 import ProductOptions from '../components/storefront/ProductOptions';
@@ -24,7 +24,6 @@ class ProductDetail extends React.Component {
       notFound: false,
       quantity: 1,
       selectedOptions: {},
-      menuOpen: false,
       searchOpen: false,
     };
     this.submitOrder = null;
@@ -145,16 +144,31 @@ class ProductDetail extends React.Component {
     var product = this.state.product;
     var related = this.state.relatedProducts;
     var store = product && product.store;
-    var whatsappNumber = store && (store.whatsapp || store.phone);
+    var whatsappNumber = getWhatsappNumber(store);
 
     if (this.state.loading) {
-      return React.createElement('div', { className: 'min-h-screen bg-white' },
+      return React.createElement('div', { className: 'product-page-bg min-h-screen' },
         React.createElement(StorefrontHeader, {
-          onMenuToggle: function () {},
+          showMenu: false,
           onSearchToggle: function () {},
         }),
-        React.createElement('div', { className: 'flex items-center justify-center min-h-[60vh]' },
-          React.createElement('div', { className: 'animate-spin rounded-full h-12 w-12 border-4 border-[#6C3DF2] border-t-transparent' })
+        React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12' },
+          React.createElement('div', { className: 'product-surface overflow-hidden animate-pulse', 'aria-busy': 'true' },
+            React.createElement('div', { className: 'grid md:grid-cols-2' },
+              React.createElement('div', { className: 'aspect-square bg-purple-50/70' }),
+              React.createElement('div', { className: 'p-6 sm:p-8 lg:p-10 space-y-4' },
+                React.createElement('div', { className: 'h-5 w-28 rounded-full bg-purple-100' }),
+                React.createElement('div', { className: 'h-9 w-3/4 rounded-xl bg-gray-100' }),
+                React.createElement('div', { className: 'h-4 w-full rounded-lg bg-gray-100' }),
+                React.createElement('div', { className: 'h-4 w-5/6 rounded-lg bg-gray-100' }),
+                React.createElement('div', { className: 'h-4 w-2/3 rounded-lg bg-gray-100' })
+              )
+            )
+          ),
+          React.createElement('div', { className: 'mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6' },
+            React.createElement('div', { className: 'product-surface h-56 lg:col-span-7 xl:col-span-8 animate-pulse bg-purple-50/40' }),
+            React.createElement('div', { className: 'product-surface h-96 lg:col-span-5 xl:col-span-4 animate-pulse bg-purple-50/40' })
+          )
         )
       );
     }
@@ -163,134 +177,124 @@ class ProductDetail extends React.Component {
       return React.createElement(NotFound);
     }
 
-    return React.createElement('div', { className: 'min-h-screen bg-white' },
+    return React.createElement('div', { className: 'product-page-bg min-h-screen' },
 
-      this.state.menuOpen && React.createElement('div', {
-        className: 'fixed inset-0 z-50 bg-black/40',
-        onClick: function () { this.setState({ menuOpen: false }); }.bind(this),
-      }),
-
-      React.createElement('div', {
-        className: 'fixed top-0 left-0 bottom-0 w-72 bg-white z-50 shadow-2xl transform transition-transform duration-300 ' +
-          (this.state.menuOpen ? 'translate-x-0' : '-translate-x-full'),
+      this.state.searchOpen && React.createElement('div', {
+        className: 'fixed inset-0 z-[60] bg-gray-950/50 backdrop-blur-sm px-4 pt-24',
+        onClick: function () { this.setState({ searchOpen: false }); }.bind(this),
       },
-        React.createElement('div', { className: 'p-6' },
-          React.createElement('div', { className: 'flex items-center justify-between mb-8' },
-            React.createElement('div', { className: 'flex items-center space-x-2' },
-              React.createElement('div', { className: 'w-9 h-9 bg-[#6C3DF2] rounded-xl flex items-center justify-center' },
-                React.createElement('span', { className: 'text-sm font-bold text-white' }, t('app.logo'))
-              ),
-              React.createElement('span', { className: 'text-lg font-bold text-gray-900' }, t('app.name'))
-            ),
-            React.createElement('button', {
-              onClick: function () { this.setState({ menuOpen: false }); }.bind(this),
-              className: 'p-1 text-gray-400 hover:text-gray-600',
-            },
-              React.createElement('span', { className: 'text-2xl' }, '\u00D7')
-            )
-          ),
-          React.createElement('nav', { className: 'space-y-2' },
-            React.createElement('a', { href: '/', className: 'block px-4 py-3 rounded-xl bg-[#6C3DF2]/10 text-[#6C3DF2] font-medium' }, t('nav.home')),
-            React.createElement('a', { href: '/login', className: 'block px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 font-medium transition-colors' }, t('auth.signIn')),
-            React.createElement('a', { href: '/register', className: 'block px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 font-medium transition-colors' }, t('auth.signUp')),
-            React.createElement('hr', { className: 'border-gray-200 my-2' }),
-            React.createElement('p', { className: 'px-4 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wider' }, t('storefront.header.language')),
-            LANGUAGES.map(function (lang) {
-              return React.createElement('button', {
-                key: lang.code,
-                onClick: function () {
-                  store.dispatch(languageSlice.setLanguage(lang.code));
-                  this.setState({ menuOpen: false });
-                }.bind(this),
-                className: 'block w-full text-left px-4 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 font-medium transition-colors',
-              }, lang.label);
-            }.bind(this))
+        React.createElement('div', {
+          className: 'mx-auto w-full max-w-xl rounded-3xl bg-white p-2 shadow-2xl ring-1 ring-purple-100',
+          onClick: function (e) { e.stopPropagation(); },
+        },
+          React.createElement('div', { className: 'flex items-center gap-2 px-3' },
+            React.createElement(MagnifyingGlassIcon, { className: 'w-5 h-5 text-purple-500 flex-shrink-0' }),
+            React.createElement('input', {
+              type: 'text',
+              placeholder: t('storefront.search.placeholder'),
+              className: 'w-full bg-transparent px-2 py-3 text-base text-gray-800 placeholder-gray-400 focus:outline-none',
+              autoFocus: true,
+            })
           )
         )
       ),
 
-      this.state.searchOpen && React.createElement('div', {
-        className: 'fixed inset-0 z-50 bg-black/40',
-        onClick: function () { this.setState({ searchOpen: false }); }.bind(this),
-      },
-        React.createElement('div', {
-          className: 'bg-white mx-4 mt-20 rounded-2xl p-4 shadow-2xl max-w-lg mx-auto',
-          onClick: function (e) { e.stopPropagation(); },
-        },
-          React.createElement('input', {
-            type: 'text',
-            placeholder: t('storefront.search.placeholder'),
-            className: 'w-full px-4 py-3 border-2 border-[#6C3DF2]/30 rounded-xl text-base focus:outline-none focus:border-[#6C3DF2]',
-            autoFocus: true,
-          })
-        )
-      ),
-
       React.createElement(StorefrontHeader, {
-        onMenuToggle: function () { this.setState({ menuOpen: !this.state.menuOpen }); }.bind(this),
+        showMenu: false,
         onSearchToggle: function () { this.setState({ searchOpen: !this.state.searchOpen }); }.bind(this),
         onLogoClick: function () { window.location.href = '/'; },
       }),
 
-      React.createElement('main', { className: 'pb-28' },
-        React.createElement('div', { className: 'max-w-7xl mx-auto px-4 py-6 space-y-6' },
-          React.createElement(ProductCard, { product: product }),
+      React.createElement('main', { className: 'relative pb-28' },
+        React.createElement('div', { className: 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10' },
 
-          product && React.createElement(ProductOptions, {
-            product: product,
-            selectedOptions: this.state.selectedOptions,
-            onOptionChange: this.handleOptionChange.bind(this),
-          }),
-
-          product && React.createElement(PriceSection, {
-            price: product.price,
-            comparePrice: product.comparePrice,
-          }),
-
-          React.createElement(QuantitySelector, {
-            quantity: this.state.quantity,
-            onChange: function (val) { this.setState({ quantity: val }); }.bind(this),
-          }),
-
-          product && React.createElement(CheckoutPanel, {
-            product: product,
-            quantity: this.state.quantity,
-            onRegisterSubmit: this.registerSubmit.bind(this),
-            onOrderPlaced: this.handleOrderPlaced.bind(this),
-          }),
-
-          product && product.description && React.createElement('div', { className: 'bg-white rounded-2xl p-5 shadow-lg border-2 border-[#6C3DF2]/20' },
-            React.createElement('h2', { className: 'text-lg font-semibold text-gray-900 mb-3' }, t('storefront.description.title')),
-            React.createElement('div', { className: 'text-base text-gray-600 leading-relaxed whitespace-pre-wrap' }, product.description)
+          React.createElement('div', { className: 'product-reveal' },
+            React.createElement(ProductCard, { product: product })
           ),
 
-          related.length > 0 && React.createElement('div', null,
-            React.createElement('h2', { className: 'text-xl font-bold text-gray-900 mb-4' }, t('storefront.relatedProducts.title')),
-            React.createElement('div', { className: 'flex space-x-4 overflow-x-auto scrollbar-hide pb-2' },
+          React.createElement('div', { className: 'mt-6 lg:mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start' },
+
+            // Purchase controls
+            React.createElement('div', { className: 'space-y-5 sm:space-y-6 lg:col-span-7 xl:col-span-8 lg:col-start-1 lg:row-start-1 product-reveal product-reveal-delay-1' },
+              product && React.createElement(ProductOptions, {
+                product: product,
+                selectedOptions: this.state.selectedOptions,
+                onOptionChange: this.handleOptionChange.bind(this),
+              }),
+
+              React.createElement('div', { className: 'grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6' },
+                product && React.createElement(PriceSection, {
+                  price: product.price,
+                  comparePrice: product.comparePrice,
+                }),
+
+                React.createElement(QuantitySelector, {
+                  quantity: this.state.quantity,
+                  onChange: function (val) { this.setState({ quantity: val }); }.bind(this),
+                })
+              )
+            ),
+
+            // Checkout column (appears right after the purchase controls on mobile)
+            React.createElement('div', { className: 'lg:col-span-5 xl:col-span-4 lg:col-start-8 xl:col-start-9 lg:row-start-1 lg:row-span-2 product-reveal product-reveal-delay-2' },
+              product && React.createElement(CheckoutPanel, {
+                product: product,
+                quantity: this.state.quantity,
+                onRegisterSubmit: this.registerSubmit.bind(this),
+                onOrderPlaced: this.handleOrderPlaced.bind(this),
+              })
+            ),
+
+            // Product details and store information
+            React.createElement('div', { className: 'space-y-5 sm:space-y-6 lg:col-span-7 xl:col-span-8 lg:col-start-1 lg:row-start-2 product-reveal product-reveal-delay-2' },
+
+              product && product.description && React.createElement('div', { className: 'product-surface p-5 sm:p-6 lg:p-8' },
+                React.createElement('div', { className: 'mb-3 flex items-center gap-3' },
+                  React.createElement('span', { className: 'h-6 w-1.5 rounded-full bg-gradient-to-b from-[#5B21B6] to-[#6C3DF2]' }),
+                  React.createElement('h2', { className: 'text-lg sm:text-xl font-bold tracking-tight text-gray-900' }, t('storefront.description.title'))
+                ),
+                React.createElement('div', { className: 'text-sm sm:text-base text-gray-600 leading-7 whitespace-pre-wrap' }, product.description)
+              ),
+
+              product && React.createElement(StoreInfo, { store: product.store })
+            )
+          ),
+
+          related.length > 0 && React.createElement('section', { className: 'mt-10 lg:mt-14 product-reveal product-reveal-delay-3' },
+            React.createElement('div', { className: 'mb-5 flex items-center gap-3' },
+              React.createElement('span', { className: 'h-7 w-1.5 rounded-full bg-gradient-to-b from-[#5B21B6] to-[#6C3DF2]' }),
+              React.createElement('h2', { className: 'text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900' }, t('storefront.relatedProducts.title'))
+            ),
+            React.createElement('div', { className: 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5' },
               related.map(function (rp) {
                 var img = rp.image || (rp.images && rp.images.length > 0 ? rp.images[0].url : null);
                 return React.createElement('a', {
                   key: rp.id,
                   href: '/products/' + rp.slug,
-                  className: 'flex-shrink-0 w-44 bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:shadow-lg transition-shadow block',
+                  className: 'group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-purple-100/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl',
                 },
-                  React.createElement('div', { className: 'aspect-square bg-gray-50 flex items-center justify-center' },
+                  React.createElement('div', { className: 'relative aspect-square overflow-hidden bg-gradient-to-br from-purple-50 via-white to-indigo-50' },
                     img
-                      ? React.createElement('img', { src: img, alt: rp.name, className: 'w-full h-full object-cover' })
-                      : React.createElement('div', { className: 'w-12 h-12 bg-gray-200 rounded-full' })
+                      ? React.createElement('img', {
+                          src: img,
+                          alt: rp.name,
+                          className: 'h-full w-full object-cover transition-transform duration-500 group-hover:scale-105',
+                          loading: 'lazy',
+                        })
+                      : React.createElement('div', { className: 'flex h-full w-full items-center justify-center' },
+                          React.createElement('div', { className: 'w-12 h-12 bg-purple-100 rounded-full' })
+                        )
                   ),
-                  React.createElement('div', { className: 'p-3' },
-                    React.createElement('h3', { className: 'font-medium text-gray-900 text-sm truncate' }, rp.name),
-                    React.createElement('p', { className: 'text-sm font-bold text-[#6C3DF2] mt-1' },
+                  React.createElement('div', { className: 'flex flex-1 flex-col gap-1 p-3 sm:p-4' },
+                    React.createElement('h3', { className: 'truncate text-sm font-semibold text-gray-900' }, rp.name),
+                    React.createElement('p', { className: 'text-sm font-bold text-purple-700' },
                       parseFloat(rp.price).toFixed(2) + ' DA'
                     )
                   )
                 );
               })
             )
-          ),
-
-          product && React.createElement(StoreInfo, { store: product.store })
+          )
         )
       ),
 

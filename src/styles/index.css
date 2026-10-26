@@ -79,6 +79,53 @@
   .storefront-gradient {
     @apply bg-gradient-to-r from-purple-700 to-purple-600;
   }
+  .product-surface {
+    @apply bg-white rounded-3xl shadow-lg ring-1 ring-purple-100/80 transition-shadow duration-300;
+  }
+  .product-surface:hover {
+    @apply shadow-xl;
+  }
+}
+
+.product-page-bg {
+  background-color: #f8f7ff;
+  background-image:
+    radial-gradient(900px 520px at 0% -10%, rgba(108, 61, 242, 0.11), transparent 60%),
+    radial-gradient(760px 420px at 100% 0%, rgba(99, 102, 241, 0.09), transparent 58%),
+    radial-gradient(700px 500px at 50% 100%, rgba(236, 72, 153, 0.05), transparent 65%);
+}
+
+@keyframes product-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-reveal {
+  animation: product-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.product-reveal-delay-1 {
+  animation-delay: 0.06s;
+}
+
+.product-reveal-delay-2 {
+  animation-delay: 0.12s;
+}
+
+.product-reveal-delay-3 {
+  animation-delay: 0.18s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-reveal {
+    animation: none;
+  }
 }
 
 [dir="rtl"] .mr-1 { margin-left: 0.25rem; margin-right: 0; }

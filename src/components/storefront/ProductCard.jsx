@@ -126,7 +126,7 @@ class ProductCard extends React.Component {
       ? this._cloudinaryTransform(currentImage.url, 1200, 1200, 'fit')
       : null;
 
-    return React.createElement('div', { className: 'bg-white rounded-2xl overflow-hidden shadow-lg border-2 border-[#6C3DF2]/20' },
+    return React.createElement('div', { className: 'group bg-white rounded-3xl overflow-hidden shadow-xl shadow-purple-900/5 ring-1 ring-purple-100/80' },
 
       // Main Content: Image + Info
       React.createElement('div', { className: 'flex flex-col md:flex-row' },
@@ -136,7 +136,7 @@ class ProductCard extends React.Component {
 
           // Main Image Container
           React.createElement('div', {
-            className: 'relative bg-gray-50 overflow-hidden cursor-crosshair',
+            className: 'relative bg-gradient-to-br from-purple-50 via-white to-indigo-50 overflow-hidden cursor-crosshair',
             onMouseMove: this.handleMouseMove,
             onMouseLeave: this.handleMouseLeave,
           },
@@ -145,7 +145,7 @@ class ProductCard extends React.Component {
                   ref: this.imageRef,
                   src: mainImageSrc,
                   alt: currentImage.alt || product.name,
-                  className: 'w-full aspect-square object-contain select-none',
+                  className: 'w-full aspect-square object-contain select-none transition-transform duration-500 ease-out group-hover:scale-[1.02]',
                   onClick: this.openLightbox.bind(this),
                   loading: 'lazy',
                 })
@@ -168,14 +168,14 @@ class ProductCard extends React.Component {
             hasMultipleImages && React.createElement(React.Fragment, null,
               React.createElement('button', {
                 onClick: this.goToPrev.bind(this),
-                className: 'absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow hover:bg-white transition-colors z-10',
+                className: 'absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/85 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 active:scale-95 transition-all z-10',
                 'aria-label': t('common.previous'),
               },
                 React.createElement(ChevronLeftIcon, { className: 'w-5 h-5 text-gray-700' })
               ),
               React.createElement('button', {
                 onClick: this.goToNext.bind(this),
-                className: 'absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow hover:bg-white transition-colors z-10',
+                className: 'absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/85 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 active:scale-95 transition-all z-10',
                 'aria-label': t('common.next'),
               },
                 React.createElement(ChevronRightIcon, { className: 'w-5 h-5 text-gray-700' })
@@ -185,7 +185,7 @@ class ProductCard extends React.Component {
             // Expand button
             currentImage && React.createElement('button', {
               onClick: this.openLightbox.bind(this),
-              className: 'absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow hover:bg-white transition-colors z-10',
+              className: 'absolute top-3 right-3 w-9 h-9 bg-white/85 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:bg-white hover:scale-105 active:scale-95 transition-all z-10',
               'aria-label': t('storefront.gallery.expand'),
             },
               React.createElement('svg', { className: 'w-4 h-4 text-gray-700', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', strokeWidth: 2 },
@@ -196,19 +196,19 @@ class ProductCard extends React.Component {
 
           // Image Counter Badge
           hasMultipleImages && React.createElement('div', {
-            className: 'absolute top-3 left-3 bg-black/50 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full z-10',
+            className: 'absolute top-3 left-3 bg-gray-950/55 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full z-10',
           },
             (this.state.currentImage + 1) + ' / ' + images.length
           ),
 
           // Thumbnails
-          hasMultipleImages && React.createElement('div', { className: 'flex gap-2 px-3 py-3 overflow-x-auto scrollbar-hide bg-gray-50/80' },
+          hasMultipleImages && React.createElement('div', { className: 'flex gap-2 px-3 py-3 overflow-x-auto scrollbar-hide bg-gradient-to-b from-white to-purple-50/60' },
             images.map(function (img, i) {
               var isActive = i === this.state.currentImage;
               return React.createElement('button', {
                 key: i,
                 onClick: this.selectImage.bind(this, i),
-                className: 'flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ' +
+                className: 'flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-all hover:-translate-y-0.5 ' +
                   (isActive ? 'border-[#6C3DF2] shadow-md ring-2 ring-[#6C3DF2]/30' : 'border-transparent hover:border-gray-300 opacity-70 hover:opacity-100'),
               },
                 React.createElement('img', {
@@ -223,9 +223,16 @@ class ProductCard extends React.Component {
         ),
 
         // Right: Product Info
-        React.createElement('div', { className: 'flex-1 p-5 md:p-6 lg:p-8 space-y-3' },
-          React.createElement('h1', { className: 'text-2xl md:text-3xl font-bold text-gray-900' }, product.name),
-          React.createElement('p', { className: 'text-base text-gray-600 leading-relaxed' }, product.description || '')
+        React.createElement('div', { className: 'flex-1 p-5 sm:p-6 lg:p-8 flex flex-col justify-center gap-3 sm:gap-4' },
+          product.category && product.category.name
+            ? React.createElement('div', null,
+                React.createElement('span', {
+                  className: 'inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-purple-700 ring-1 ring-purple-100',
+                }, product.category.name)
+              )
+            : null,
+          React.createElement('h1', { className: 'text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-gray-900 leading-tight' }, product.name),
+          React.createElement('p', { className: 'text-sm sm:text-base text-gray-600 leading-relaxed' }, product.description || '')
         )
       ),
 

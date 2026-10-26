@@ -5,10 +5,10 @@ import { publicShippingAPI } from '../../api/shipping';
 import { notify } from '../common/Toast';
 import MetaPixel from '../../utils/pixel';
 
-var inputClass = 'w-full px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#6C3DF2]/40 focus:border-[#6C3DF2] transition-colors';
-var selectClass = inputClass + ' bg-white';
-var labelClass = 'block text-sm font-medium text-gray-700 mb-1';
-var cardClass = 'bg-white rounded-2xl p-6 shadow-lg border border-gray-100';
+var inputClass = 'w-full px-4 py-3 bg-gray-50/70 border border-purple-100 rounded-2xl text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#6C3DF2]/30 focus:border-[#6C3DF2] transition-all';
+var selectClass = inputClass + ' bg-white cursor-pointer';
+var labelClass = 'block text-sm font-semibold text-gray-700 mb-1.5';
+var cardClass = 'product-surface p-5 sm:p-6';
 
 class CheckoutPanel extends React.Component {
   constructor(props) {
@@ -391,11 +391,11 @@ class CheckoutPanel extends React.Component {
     return React.createElement('form', {
       id: 'product-checkout',
       onSubmit: this.handleSubmit,
-      className: 'space-y-6',
+      className: 'space-y-6 scroll-mt-24',
     },
       // Customer information + delivery method card
       React.createElement('div', { className: cardClass },
-        React.createElement('h2', { className: 'text-lg font-semibold text-gray-900 mb-5' }, t('storefront.customerInfo.title')),
+        React.createElement('h2', { className: 'text-lg font-bold tracking-tight text-gray-900 mb-5' }, t('storefront.customerInfo.title')),
 
         React.createElement('div', { className: 'space-y-4' },
           React.createElement('div', null,
@@ -540,12 +540,12 @@ class CheckoutPanel extends React.Component {
 
       // Order summary card
       React.createElement('div', { className: cardClass },
-        React.createElement('h2', { className: 'text-lg font-semibold text-gray-900 mb-5' }, t('checkout.orderSummary')),
+        React.createElement('h2', { className: 'text-lg font-bold tracking-tight text-gray-900 mb-5' }, t('checkout.orderSummary')),
 
         React.createElement('div', { className: 'flex items-center space-x-4 py-3 border-b border-gray-100' },
           productImage
-            ? React.createElement('img', { src: productImage, alt: product.name, className: 'w-16 h-16 rounded-xl object-cover' })
-            : React.createElement('div', { className: 'w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center' },
+            ? React.createElement('img', { src: productImage, alt: product.name, className: 'w-16 h-16 rounded-2xl object-cover ring-1 ring-purple-100' })
+            : React.createElement('div', { className: 'w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center' },
                 React.createElement('svg', { className: 'w-8 h-8 text-gray-300', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' },
                   React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' })
                 )
@@ -615,7 +615,7 @@ class CheckoutPanel extends React.Component {
         React.createElement('button', {
           type: 'submit',
           disabled: state.submitting || state.couponApplying,
-          className: 'w-full py-4 mt-5 bg-gradient-to-r from-[#5B21B6] to-[#6C3DF2] text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl hover:shadow-[#6C3DF2]/30 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 disabled:cursor-not-allowed',
+          className: 'w-full py-4 mt-5 bg-gradient-to-r from-[#5B21B6] via-[#6C3DF2] to-[#7C4DFF] text-white font-bold text-lg rounded-2xl shadow-lg shadow-purple-900/20 hover:shadow-xl hover:shadow-purple-900/30 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-60 disabled:cursor-not-allowed',
         },
           state.submitting
             ? React.createElement('span', { className: 'flex items-center justify-center space-x-2' },

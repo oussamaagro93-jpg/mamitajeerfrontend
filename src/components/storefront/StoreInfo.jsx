@@ -2,21 +2,23 @@ import React from 'react';
 import { withTranslation } from 'react-i18next';
 import { PhoneIcon, EnvelopeIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { FaFacebookF, FaInstagram, FaXTwitter, FaWhatsapp } from 'react-icons/fa6';
+import { getAssignedPhones, getWhatsappNumber } from '../../utils/storeContacts';
 
 class StoreInfo extends React.Component {
   render() {
     var t = this.props.t;
     var store = this.props.store;
 
+    var phones = getAssignedPhones(store);
+    var whatsapp = getWhatsappNumber(store);
+
     var hasData = store && (
-      store.name || store.logo || store.phone || store.whatsapp ||
+      store.name || store.logo || phones.length > 0 || whatsapp ||
       store.email || store.address || store.facebook || store.instagram || store.x
     );
     if (!hasData) return null;
 
     var name = store.name || t('app.name');
-    var phone = (store.phone || '').trim();
-    var whatsapp = (store.whatsapp || '').trim();
     var email = (store.email || '').trim();
     var address = (store.address || '').trim();
 
@@ -26,38 +28,39 @@ class StoreInfo extends React.Component {
       { key: 'x', href: store.x, label: 'X', icon: FaXTwitter },
     ].filter(function (item) { return !!item.href; });
 
-    var iconButtonClass = 'w-11 h-11 bg-[#6C3DF2] rounded-full flex items-center justify-center text-white hover:bg-[#5B21B6] transition-colors';
+    var iconButtonClass = 'w-11 h-11 bg-gradient-to-br from-[#5B21B6] to-[#6C3DF2] rounded-full flex items-center justify-center text-white shadow-md shadow-purple-900/20 hover:shadow-lg hover:scale-110 active:scale-95 transition-all';
 
-    return React.createElement('div', { className: 'bg-white rounded-2xl p-6 shadow-lg border-2 border-[#6C3DF2]/20 text-center space-y-4' },
+    return React.createElement('div', { className: 'product-surface overflow-hidden p-6 sm:p-8 text-center space-y-4' },
       store.logo
         ? React.createElement('img', {
             src: store.logo,
             alt: name,
-            className: 'w-16 h-16 rounded-2xl object-cover mx-auto shadow-lg',
+            className: 'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover mx-auto shadow-lg ring-4 ring-purple-50',
           })
         : React.createElement('div', {
-            className: 'w-16 h-16 bg-[#6C3DF2] rounded-2xl flex items-center justify-center mx-auto shadow-lg',
+            className: 'w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#5B21B6] to-[#6C3DF2] rounded-2xl flex items-center justify-center mx-auto shadow-lg shadow-purple-900/20',
           },
-            React.createElement('span', { className: 'text-2xl font-bold text-white' }, name.charAt(0).toUpperCase())
+            React.createElement('span', { className: 'text-2xl sm:text-3xl font-bold text-white' }, name.charAt(0).toUpperCase())
           ),
 
-      React.createElement('h3', { className: 'text-xl font-bold text-gray-900' }, name),
+      React.createElement('h3', { className: 'text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900' }, name),
 
-      phone
-        ? React.createElement('a', {
-            href: 'tel:' + phone.replace(/[^\d+]/g, ''),
-            className: 'flex items-center justify-center space-x-2 text-gray-600 hover:text-[#6C3DF2] transition-colors',
-            dir: 'ltr',
-          },
-            React.createElement(PhoneIcon, { className: 'w-5 h-5' }),
-            React.createElement('span', { className: 'text-base' }, phone)
-          )
-        : null,
+      phones.map(function (value, index) {
+        return React.createElement('a', {
+          key: 'phone-' + index,
+          href: 'tel:' + value.replace(/[^\d+]/g, ''),
+          className: 'mx-auto inline-flex items-center justify-center gap-2 rounded-xl px-3 py-1.5 text-gray-600 hover:text-[#6C3DF2] hover:bg-purple-50 transition-colors',
+          dir: 'ltr',
+        },
+          React.createElement(PhoneIcon, { className: 'w-5 h-5' }),
+          React.createElement('span', { className: 'text-base' }, value)
+        );
+      }),
 
       email
         ? React.createElement('a', {
             href: 'mailto:' + email,
-            className: 'flex items-center justify-center space-x-2 text-gray-600 hover:text-[#6C3DF2] transition-colors break-all',
+            className: 'mx-auto inline-flex items-center justify-center gap-2 rounded-xl px-3 py-1.5 text-gray-600 hover:text-[#6C3DF2] hover:bg-purple-50 transition-colors break-all',
           },
             React.createElement(EnvelopeIcon, { className: 'w-5 h-5 flex-shrink-0' }),
             React.createElement('span', { className: 'text-base' }, email)
@@ -76,7 +79,7 @@ class StoreInfo extends React.Component {
             href: 'https://wa.me/' + whatsapp.replace(/\D/g, ''),
             target: '_blank',
             rel: 'noopener noreferrer',
-            className: 'inline-flex items-center justify-center space-x-2 px-5 py-3 rounded-xl bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors',
+            className: 'inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold shadow-lg shadow-emerald-900/15 hover:shadow-xl hover:scale-[1.03] active:scale-[0.98] transition-all',
           },
             React.createElement(FaWhatsapp, { className: 'w-5 h-5' }),
             React.createElement('span', null, t('storefront.store.whatsapp'))

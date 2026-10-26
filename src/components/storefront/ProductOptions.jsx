@@ -38,41 +38,46 @@ class ProductOptions extends React.Component {
     var hasOptions = variantColors.length > 0 || variantSizes.length > 0 || otherOptions.length > 0;
     if (!hasOptions) return null;
 
-    var selectClass = 'w-full px-4 py-3 bg-white border-2 border-[#6C3DF2]/30 rounded-xl text-gray-700 text-base appearance-none cursor-pointer focus:outline-none focus:border-[#6C3DF2] focus:ring-2 focus:ring-[#6C3DF2]/20 transition-all';
+    var selectClass = 'w-full px-4 py-3 bg-white border border-purple-100 rounded-2xl text-gray-700 text-base appearance-none cursor-pointer focus:outline-none focus:border-[#6C3DF2] focus:ring-2 focus:ring-[#6C3DF2]/20 transition-all';
+    var labelClass = 'block text-xs font-semibold uppercase tracking-[0.14em] text-gray-500 mb-2';
 
-    return React.createElement('div', { className: 'space-y-3' },
+    return React.createElement('div', { className: 'product-surface p-5 sm:p-6 space-y-5' },
       variantColors.length > 0 && React.createElement('div', null,
-        React.createElement('label', { className: 'block text-sm font-medium text-gray-500 mb-1.5' }, t('storefront.options.color')),
+        React.createElement('label', { className: labelClass }, t('storefront.options.color')),
         React.createElement('div', { className: 'flex flex-wrap gap-2' },
           variantColors.map(function (color) {
             var isSelected = selected.color === color;
             return React.createElement('button', {
               key: color,
               onClick: function () { onChange('color', color); },
-              className: 'px-4 py-2 rounded-xl text-sm font-medium transition-all border-2 ' +
-                (isSelected ? 'bg-[#6C3DF2] text-white border-[#6C3DF2] shadow-md' : 'bg-white text-gray-700 border-gray-200 hover:border-[#6C3DF2]/50'),
+              className: 'px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ' +
+                (isSelected
+                  ? 'bg-gradient-to-r from-[#5B21B6] to-[#6C3DF2] text-white border-transparent shadow-lg shadow-purple-900/20 scale-[1.02]'
+                  : 'bg-white text-gray-700 border-purple-100 hover:border-purple-300 hover:bg-purple-50/60 hover:-translate-y-0.5'),
             }, color);
           })
         )
       ),
 
       variantSizes.length > 0 && React.createElement('div', null,
-        React.createElement('label', { className: 'block text-sm font-medium text-gray-500 mb-1.5' }, t('storefront.options.size')),
+        React.createElement('label', { className: labelClass }, t('storefront.options.size')),
         React.createElement('div', { className: 'flex flex-wrap gap-2' },
           variantSizes.map(function (size) {
             var isSelected = selected.size === size;
             return React.createElement('button', {
               key: size,
               onClick: function () { onChange('size', size); },
-              className: 'px-4 py-2 rounded-xl text-sm font-medium transition-all border-2 ' +
-                (isSelected ? 'bg-[#6C3DF2] text-white border-[#6C3DF2] shadow-md' : 'bg-white text-gray-700 border-gray-200 hover:border-[#6C3DF2]/50'),
+              className: 'px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border ' +
+                (isSelected
+                  ? 'bg-gradient-to-r from-[#5B21B6] to-[#6C3DF2] text-white border-transparent shadow-lg shadow-purple-900/20 scale-[1.02]'
+                  : 'bg-white text-gray-700 border-purple-100 hover:border-purple-300 hover:bg-purple-50/60 hover:-translate-y-0.5'),
             }, size);
           })
         )
       ),
 
       otherOptions.length > 0 && React.createElement('div', null,
-        React.createElement('label', { className: 'block text-sm font-medium text-gray-500 mb-1.5' }, t('storefront.options.variant')),
+        React.createElement('label', { className: labelClass }, t('storefront.options.variant')),
         React.createElement('div', { className: 'relative' },
           React.createElement('select', {
             value: selected.option3 || '',

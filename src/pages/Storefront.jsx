@@ -3,6 +3,7 @@ import { withTranslation } from 'react-i18next';
 import { productAPI } from '../api';
 import { publicShippingAPI } from '../api/shipping';
 import MetaPixel from '../utils/pixel';
+import { getWhatsappNumber } from '../utils/storeContacts';
 import { LANGUAGES, languageSlice } from '../store/languageSlice';
 import { store } from '../store';
 import StorefrontHeader from '../components/storefront/StorefrontHeader';
@@ -137,7 +138,7 @@ class Storefront extends React.Component {
     var product = this.state.product;
     var related = this.state.relatedProducts;
     var store = product && product.store;
-    var whatsappNumber = store && (store.whatsapp || store.phone);
+    var whatsappNumber = getWhatsappNumber(store);
 
     if (this.state.loading) {
       return React.createElement('div', { className: 'min-h-screen bg-white' },

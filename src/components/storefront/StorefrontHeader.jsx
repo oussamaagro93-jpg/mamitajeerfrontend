@@ -20,30 +20,33 @@ class StorefrontHeader extends React.Component {
     var currentLang = this.props.language;
     var onMenuToggle = this.props.onMenuToggle || function () {};
     var onSearchToggle = this.props.onSearchToggle || function () {};
+    var showMenu = this.props.showMenu !== false;
 
     return React.createElement('header', {
-      className: 'sticky top-0 z-40 bg-gradient-to-r from-[#5B21B6] to-[#6C3DF2] shadow-lg',
+      className: 'sticky top-0 z-40 bg-gradient-to-r from-[#5B21B6] via-[#6C3DF2] to-[#7C4DFF] shadow-lg shadow-purple-900/20 border-b border-white/10',
     },
-      React.createElement('div', { className: 'flex items-center justify-between px-4 py-3 max-w-7xl mx-auto' },
+      React.createElement('div', { className: 'flex items-center justify-between gap-3 px-4 sm:px-6 py-3 max-w-7xl mx-auto' },
 
-        React.createElement('button', {
-          onClick: onMenuToggle,
-          className: 'p-2 text-white hover:bg-white/10 rounded-full transition-colors',
-          'aria-label': t('storefront.header.menu'),
-        },
-          React.createElement(Bars3Icon, { className: 'w-6 h-6' })
-        ),
+        showMenu
+          ? React.createElement('button', {
+              onClick: onMenuToggle,
+              className: 'p-2 text-white hover:bg-white/10 rounded-full transition-colors active:scale-95',
+              'aria-label': t('storefront.header.menu'),
+            },
+              React.createElement(Bars3Icon, { className: 'w-6 h-6' })
+            )
+          : null,
 
         React.createElement('div', {
           onClick: this.props.onLogoClick || function () { window.location.href = '/'; },
-          className: 'flex items-center space-x-2 cursor-pointer',
+          className: 'flex items-center gap-2 cursor-pointer min-w-0 group',
         },
           React.createElement('div', {
-            className: 'w-9 h-9 bg-white rounded-xl flex items-center justify-center',
+            className: 'w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-md shadow-purple-950/20 transition-transform duration-300 group-hover:rotate-3 group-hover:scale-105',
           },
             React.createElement('span', { className: 'text-sm font-bold text-[#6C3DF2]' }, t('app.logo'))
           ),
-          React.createElement('span', { className: 'text-lg font-bold text-white' }, t('app.name'))
+          React.createElement('span', { className: 'text-lg font-bold text-white truncate' }, t('app.name'))
         ),
 
         React.createElement('div', { className: 'flex items-center space-x-1' },

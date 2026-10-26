@@ -14,6 +14,7 @@ function emptyStore() {
     logo: '',
     email: '',
     phone: '',
+    phone2: '',
     whatsapp: '',
     address: '',
     facebook: '',
@@ -46,6 +47,7 @@ class Settings extends React.Component {
             logo: store.logo || '',
             email: store.email || '',
             phone: store.phone || '',
+            phone2: store.phone2 || '',
             whatsapp: store.whatsapp || '',
             address: store.address || '',
             facebook: store.facebook || '',
@@ -136,6 +138,22 @@ class Settings extends React.Component {
             React.createElement('div', null,
               React.createElement('label', { className: 'label' }, t('settings.storeLogo')),
               React.createElement('input', { type: 'url', value: store.logo, onChange: function (e) { this.handleStoreChange('logo', e.target.value); }.bind(this), className: 'input-field', placeholder: 'https://' })
+            ),
+            React.createElement('div', { className: 'md:col-span-2' },
+              React.createElement('label', { className: 'label' }, t('settings.storeEmail')),
+              React.createElement('input', { type: 'email', value: store.email, onChange: function (e) { this.handleStoreChange('email', e.target.value); }.bind(this), className: 'input-field', placeholder: 'name@example.com' })
+            ),
+            React.createElement('div', null,
+              React.createElement('label', { className: 'label' }, t('settings.storePhone')),
+              React.createElement('input', { type: 'tel', value: store.phone, onChange: function (e) { this.handleStoreChange('phone', e.target.value); }.bind(this), className: 'input-field', placeholder: '+213 555 000 000' })
+            ),
+            React.createElement('div', null,
+              React.createElement('label', { className: 'label' }, t('settings.storePhone2')),
+              React.createElement('input', { type: 'tel', value: store.phone2, onChange: function (e) { this.handleStoreChange('phone2', e.target.value); }.bind(this), className: 'input-field', placeholder: '+213 555 000 000' })
+            ),
+            React.createElement('div', { className: 'md:col-span-2' },
+              React.createElement('label', { className: 'label' }, t('settings.storeWhatsapp')),
+              React.createElement('input', { type: 'tel', value: store.whatsapp, onChange: function (e) { this.handleStoreChange('whatsapp', e.target.value); }.bind(this), className: 'input-field', placeholder: '+213 555 000 000' })
             ),
             React.createElement('div', { className: 'md:col-span-2' },
               React.createElement('label', { className: 'label' }, t('settings.storeAddress')),
