@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { withTranslation } from 'react-i18next';
 import { customerAPI } from '../api';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { formatDzd } from '../utils/money';
 
 class CustomerDetail extends React.Component {
   constructor(props) {
@@ -50,7 +51,7 @@ class CustomerDetail extends React.Component {
             ? customer.orders.slice(0, 5).map(function (order) {
                 return React.createElement(Link, { key: order.id, to: '/admin/orders/' + order.id, className: 'flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700/30 rounded-lg' },
                   React.createElement('span', { className: 'text-sm font-medium' }, order.orderNumber),
-                  React.createElement('span', { className: 'text-sm' }, '$' + parseFloat(order.total).toFixed(2))
+                  React.createElement('span', { className: 'text-sm' }, formatDzd(order.total))
                 );
               })
             : React.createElement('p', { className: 'text-sm text-gray-500' }, t('customers.noOrdersYet'))

@@ -1,7 +1,8 @@
 import React from "react";
 import { withTranslation } from "react-i18next";
+import { formatDzd } from "../utils/money";
 import {
-  CurrencyDollarIcon,
+  BanknotesIcon,
   ShoppingCartIcon,
   UsersIcon,
   CubeIcon,
@@ -487,8 +488,8 @@ class Dashboard extends React.Component {
         { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" },
         React.createElement(StatCard, {
           title: t("dashboard.totalRevenue"),
-          value: "$" + parseFloat(stats.totalRevenue || 0).toLocaleString(),
-          icon: CurrencyDollarIcon,
+          value: formatDzd(stats.totalRevenue || 0),
+          icon: BanknotesIcon,
           loading: isLoading,
           onClick: function () { window.location.href = '/admin/orders'; },
         }),
@@ -732,7 +733,7 @@ class Dashboard extends React.Component {
                       className:
                         "text-sm font-medium text-gray-900 dark:text-white",
                     },
-                    "$" + parseFloat(order.total).toFixed(2),
+                    formatDzd(order.total),
                   ),
                   React.createElement(
                     "span",

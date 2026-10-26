@@ -6,6 +6,7 @@ import { productAPI } from '../api';
 import DataTable from '../components/common/DataTable';
 import Modal from '../components/common/Modal';
 import { notify } from '../components/common/Toast';
+import { formatDzd } from '../utils/money';
 
 class Products extends React.Component {
   constructor(props) {
@@ -56,7 +57,7 @@ class Products extends React.Component {
       }},
       { key: 'sku', label: t('products.columns.sku') },
       { key: 'category', label: t('products.columns.category'), render: function (row) { return row.category ? row.category.name : '-'; }},
-      { key: 'price', label: t('products.columns.price'), render: function (row) { return '$' + parseFloat(row.price).toFixed(2); }},
+      { key: 'price', label: t('products.columns.price'), render: function (row) { return formatDzd(row.price); }},
       { key: 'quantity', label: t('products.columns.stock') },
       { key: 'status', label: t('products.columns.status'), render: function (row) {
         return React.createElement('span', { className: 'badge ' + (row.status === 'published' ? 'badge-success' : row.status === 'draft' ? 'badge-warning' : 'badge-danger') }, row.status);

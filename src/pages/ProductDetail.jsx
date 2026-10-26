@@ -1,17 +1,15 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 import { productAPI } from '../api';
-import { publicShippingAPI } from '../api/shipping';
 import MetaPixel from '../utils/pixel';
 import { LANGUAGES, languageSlice } from '../store/languageSlice';
 import { store } from '../store';
 import StorefrontHeader from '../components/storefront/StorefrontHeader';
 import ProductCard from '../components/storefront/ProductCard';
 import ProductOptions from '../components/storefront/ProductOptions';
-import CustomerInfo from '../components/storefront/CustomerInfo';
 import PriceSection from '../components/storefront/PriceSection';
 import QuantitySelector from '../components/storefront/QuantitySelector';
-import BuyButton from '../components/storefront/BuyButton';
+import CheckoutPanel from '../components/storefront/CheckoutPanel';
 import StickyBottomBar from '../components/storefront/StickyBottomBar';
 import StoreInfo from '../components/storefront/StoreInfo';
 import NotFound from './NotFound';
@@ -26,20 +24,14 @@ class ProductDetail extends React.Component {
       notFound: false,
       quantity: 1,
       selectedOptions: {},
-      customerForm: { country: '', state: '', city: '', address: '', note: '', wilayaId: '', guestWilaya: '', communeId: '' },
-      wilayas: [],
-      communes: [],
       menuOpen: false,
       searchOpen: false,
     };
+    this.submitOrder = null;
   }
 
   componentDidMount() {
     this.fetchProduct();
-    var self = this;
-    publicShippingAPI.getWilayas().then(function (res) {
-      self.setState({ wilayas: res.data.data.wilayas || [] });
-    }).catch(function () {});
   }
 
   componentDidUpdate(prevProps) {
@@ -121,51 +113,39 @@ class ProductDetail extends React.Component {
     this.setState({ selectedOptions: Object.assign({}, this.state.selectedOptions, { [key]: value }) });
   }
 
-  handleCustomerFormChange(key, value) {
-    if (typeof key === 'object') {
-      this.setState({ customerForm: Object.assign({}, this.state.customerForm, key) });
-    } else {
-      this.setState({ customerForm: Object.assign({}, this.state.customerForm, { [key]: value }) });
-    }
-  }
-
-  handleWilayaChange(wilayaId) {
-    var self = this;
-    this.setState({ communes: [] });
-    if (wilayaId) {
-      publicShippingAPI.getCommunes(wilayaId).then(function (res) {
-        self.setState({ communes: res.data.data.communes || [] });
-      }).catch(function () {});
-    }
+  registerSubmit(submit) {
+    this.submitOrder = submit;
   }
 
   handleBuyNow() {
+    var panel = document.getElementById('product-checkout');
+    if (panel && panel.scrollIntoView) {
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (this.submitOrder) this.submitOrder();
+  }
+
+  handleOrderPlaced(order) {
     var product = this.state.product;
-    var quantity = this.state.quantity;
+    var orderTotal = parseFloat(order.total) || 0;
+    var query = [];
 
-    MetaPixel.addToCart({
-      content_ids: [String(product.id)],
-      content_type: 'product',
-      contents: [{ id: String(product.id), quantity: quantity, item_price: parseFloat(product.price) }],
-      currency: 'DZD',
-      value: parseFloat(product.price) * quantity,
-    });
+    if (product.categoryId) query.push('categoryId=' + encodeURIComponent(product.categoryId));
+    if (product.category && product.category.name) {
+      query.push('categoryName=' + encodeURIComponent(product.category.name));
+    }
+    query.push('productId=' + encodeURIComponent(product.id));
+    query.push('value=' + encodeURIComponent(orderTotal.toFixed(2)));
 
-    var checkoutData = JSON.stringify({
-      slug: product.slug,
-      quantity: quantity,
-      customerForm: this.state.customerForm,
-      selectedOptions: this.state.selectedOptions,
-    });
-    try { sessionStorage.setItem('checkoutItem', checkoutData); } catch (e) {}
-
-    this.props.history.push('/checkout');
+    this.props.history.push('/order-success/' + encodeURIComponent(order.orderNumber) + '?' + query.join('&'));
   }
 
   render() {
     var t = this.props.t;
     var product = this.state.product;
     var related = this.state.relatedProducts;
+    var store = product && product.store;
+    var whatsappNumber = store && (store.whatsapp || store.phone);
 
     if (this.state.loading) {
       return React.createElement('div', { className: 'min-h-screen bg-white' },
@@ -262,14 +242,6 @@ class ProductDetail extends React.Component {
             onOptionChange: this.handleOptionChange.bind(this),
           }),
 
-          React.createElement(CustomerInfo, {
-            form: this.state.customerForm,
-            onChange: this.handleCustomerFormChange.bind(this),
-            wilayas: this.state.wilayas,
-            communes: this.state.communes,
-            onWilayaChange: this.handleWilayaChange.bind(this),
-          }),
-
           product && React.createElement(PriceSection, {
             price: product.price,
             comparePrice: product.comparePrice,
@@ -280,12 +252,12 @@ class ProductDetail extends React.Component {
             onChange: function (val) { this.setState({ quantity: val }); }.bind(this),
           }),
 
-          React.createElement('div', { className: 'hidden md:block' },
-            React.createElement(BuyButton, {
-              onClick: this.handleBuyNow.bind(this),
-              size: 'large',
-            })
-          ),
+          product && React.createElement(CheckoutPanel, {
+            product: product,
+            quantity: this.state.quantity,
+            onRegisterSubmit: this.registerSubmit.bind(this),
+            onOrderPlaced: this.handleOrderPlaced.bind(this),
+          }),
 
           product && product.description && React.createElement('div', { className: 'bg-white rounded-2xl p-5 shadow-lg border-2 border-[#6C3DF2]/20' },
             React.createElement('h2', { className: 'text-lg font-semibold text-gray-900 mb-3' }, t('storefront.description.title')),
@@ -318,7 +290,7 @@ class ProductDetail extends React.Component {
             )
           ),
 
-          React.createElement(StoreInfo, null)
+          product && React.createElement(StoreInfo, { store: product.store })
         )
       ),
 
@@ -326,7 +298,9 @@ class ProductDetail extends React.Component {
         React.createElement(StickyBottomBar, {
           onBuyClick: this.handleBuyNow.bind(this),
           onChatClick: function () { alert(t('storefront.chat.placeholder')); },
-          onWhatsAppClick: function () { window.open('https://wa.me/' + t('storefront.store.phone').replace(/\s/g, ''), '_blank'); },
+          onWhatsAppClick: whatsappNumber
+            ? function () { window.open('https://wa.me/' + whatsappNumber.replace(/\D/g, ''), '_blank'); }
+            : null,
         })
       )
     );

@@ -4,13 +4,62 @@ import { connect } from 'react-redux';
 import i18n from '../i18n';
 import { getDirection } from '../utils/direction';
 import { ThemeContext } from '../context/ThemeContext';
-import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 import { LANGUAGES } from '../store/languageSlice';
+import { storeProfileAPI } from '../api';
+import { notify } from '../components/common/Toast';
+
+function emptyStore() {
+  return {
+    name: '',
+    logo: '',
+    email: '',
+    phone: '',
+    whatsapp: '',
+    address: '',
+    facebook: '',
+    instagram: '',
+    x: '',
+  };
+}
 
 class Settings extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      store: emptyStore(),
+      storeLoading: true,
+      savingStore: false,
+    };
     this.handleLanguageChange = this.handleLanguageChange.bind(this);
+    this.handleStoreChange = this.handleStoreChange.bind(this);
+    this.handleSaveStore = this.handleSaveStore.bind(this);
+  }
+
+  componentDidMount() {
+    var self = this;
+    storeProfileAPI.get().then(function (res) {
+      var store = res.data.data.store;
+      if (store) {
+        self.setState({
+          store: {
+            name: store.name || '',
+            logo: store.logo || '',
+            email: store.email || '',
+            phone: store.phone || '',
+            whatsapp: store.whatsapp || '',
+            address: store.address || '',
+            facebook: store.facebook || '',
+            instagram: store.instagram || '',
+            x: store.x || '',
+          },
+          storeLoading: false,
+        });
+      } else {
+        self.setState({ storeLoading: false });
+      }
+    }).catch(function () {
+      self.setState({ storeLoading: false });
+    });
   }
 
   handleLanguageChange(e) {
@@ -22,9 +71,33 @@ class Settings extends React.Component {
     try { localStorage.setItem('language', code); } catch (err) {}
   }
 
+  handleStoreChange(field, value) {
+    this.setState(function (prev) {
+      var update = {};
+      update[field] = value;
+      return { store: Object.assign({}, prev.store, update) };
+    });
+  }
+
+  handleSaveStore() {
+    var self = this;
+    var t = this.props.t;
+    this.setState({ savingStore: true });
+    storeProfileAPI.update(this.state.store).then(function () {
+      notify(t('settings.storeSaved'));
+      self.setState({ savingStore: false });
+    }).catch(function (err) {
+      var message = (err.response && err.response.data && err.response.data.message) || t('common.error');
+      notify(message, 'error');
+      self.setState({ savingStore: false });
+    });
+  }
+
   render() {
     var t = this.props.t;
     var isRtl = document.documentElement.dir === 'rtl';
+    var store = this.state.store;
+
     return React.createElement(ThemeContext.Consumer, null, function (theme) {
       return React.createElement('div', { className: 'max-w-2xl mx-auto space-y-6' },
         React.createElement('div', null,
@@ -53,18 +126,40 @@ class Settings extends React.Component {
           )
         ),
         React.createElement('div', { className: 'card p-6' },
-          React.createElement('h2', { className: 'text-lg font-semibold mb-4' }, t('settings.storeInformation')),
-          React.createElement('div', { className: 'space-y-4' },
+          React.createElement('h2', { className: 'text-lg font-semibold mb-2' }, t('settings.storeInformation')),
+          React.createElement('p', { className: 'text-sm text-gray-500 mb-4' }, t('settings.contactFromAdmin')),
+          React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-4' },
             React.createElement('div', null,
               React.createElement('label', { className: 'label' }, t('settings.storeName')),
-              React.createElement('input', { type: 'text', defaultValue: t('app.name'), className: 'input-field' })
+              React.createElement('input', { type: 'text', value: store.name, onChange: function (e) { this.handleStoreChange('name', e.target.value); }.bind(this), className: 'input-field' })
             ),
             React.createElement('div', null,
-              React.createElement('label', { className: 'label' }, t('settings.storeEmail')),
-              React.createElement('input', { type: 'email', defaultValue: 'admin@tajer.com', className: 'input-field' })
+              React.createElement('label', { className: 'label' }, t('settings.storeLogo')),
+              React.createElement('input', { type: 'url', value: store.logo, onChange: function (e) { this.handleStoreChange('logo', e.target.value); }.bind(this), className: 'input-field', placeholder: 'https://' })
             ),
-            React.createElement('button', { className: 'btn-primary' }, t('settings.saveSettings'))
-          )
+            React.createElement('div', { className: 'md:col-span-2' },
+              React.createElement('label', { className: 'label' }, t('settings.storeAddress')),
+              React.createElement('textarea', { value: store.address, onChange: function (e) { this.handleStoreChange('address', e.target.value); }.bind(this), rows: 2, className: 'input-field' })
+            ),
+            React.createElement('div', null,
+              React.createElement('label', { className: 'label' }, t('settings.storeFacebook')),
+              React.createElement('input', { type: 'url', value: store.facebook, onChange: function (e) { this.handleStoreChange('facebook', e.target.value); }.bind(this), className: 'input-field', placeholder: 'https://' })
+            ),
+            React.createElement('div', null,
+              React.createElement('label', { className: 'label' }, t('settings.storeInstagram')),
+              React.createElement('input', { type: 'url', value: store.instagram, onChange: function (e) { this.handleStoreChange('instagram', e.target.value); }.bind(this), className: 'input-field', placeholder: 'https://' })
+            ),
+            React.createElement('div', { className: 'md:col-span-2' },
+              React.createElement('label', { className: 'label' }, t('settings.storeX')),
+              React.createElement('input', { type: 'url', value: store.x, onChange: function (e) { this.handleStoreChange('x', e.target.value); }.bind(this), className: 'input-field', placeholder: 'https://' })
+            )
+          ),
+          React.createElement('button', {
+            type: 'button',
+            onClick: this.handleSaveStore,
+            disabled: this.state.savingStore || this.state.storeLoading,
+            className: 'btn-primary mt-5',
+          }, this.state.savingStore ? t('settings.savingStore') : t('settings.saveSettings'))
         )
       );
     }.bind(this));

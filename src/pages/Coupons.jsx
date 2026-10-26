@@ -173,9 +173,14 @@ class Coupons extends React.Component {
     var data = this.state.data;
     var state = this.state;
     var self = this;
+    var typeLabels = {
+      percentage: t('coupons.percentage'),
+      fixed: t('coupons.fixed'),
+      free_shipping: t('coupons.freeShipping'),
+    };
     var columns = [
       { key: 'code', label: t('coupons.columns.code'), render: function (row) { return React.createElement('span', { className: 'font-mono font-medium text-primary-600' }, row.code); }},
-      { key: 'type', label: t('coupons.columns.type'), render: function (row) { return React.createElement('span', { className: 'capitalize' }, row.type.replace('_', ' ')); }},
+      { key: 'type', label: t('coupons.columns.type'), render: function (row) { return React.createElement('span', null, typeLabels[row.type] || row.type); }},
       { key: 'value', label: t('coupons.columns.value'), render: function (row) {
         if (row.type === 'free_shipping') return t('coupons.freeShipping');
         return row.type === 'percentage' ? row.value + '%' : row.value + ' DA';

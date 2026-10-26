@@ -11,7 +11,6 @@ import ResetPassword from './pages/ResetPassword';
 import Storefront from './pages/Storefront';
 import Landing from './pages/Landing';
 import ProductDetail from './pages/ProductDetail';
-import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderComplete from './pages/OrderComplete';
 import Dashboard from './pages/Dashboard';
@@ -95,8 +94,7 @@ class App extends React.Component {
         // Public product detail page
         React.createElement(Route, { exact: true, path: '/products/:slug', component: ProductDetail }),
 
-        // Public checkout pages
-        React.createElement(Route, { exact: true, path: '/checkout', component: Checkout }),
+        // Public order result pages
         React.createElement(Route, { exact: true, path: '/order-success/:orderNumber', component: OrderSuccess }),
         React.createElement(Route, { exact: true, path: '/order-complete/:orderNumber', component: OrderComplete }),
 

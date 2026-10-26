@@ -129,21 +129,15 @@ class Storefront extends React.Component {
       value: parseFloat(product.price) * quantity,
     });
 
-    var checkoutData = JSON.stringify({
-      slug: product.slug,
-      quantity: quantity,
-      customerForm: this.state.customerForm,
-      selectedOptions: this.state.selectedOptions,
-    });
-    try { sessionStorage.setItem('checkoutItem', checkoutData); } catch (e) {}
-
-    this.props.history.push('/checkout');
+    this.props.history.push('/products/' + product.slug);
   }
 
   render() {
     var t = this.props.t;
     var product = this.state.product;
     var related = this.state.relatedProducts;
+    var store = product && product.store;
+    var whatsappNumber = store && (store.whatsapp || store.phone);
 
     if (this.state.loading) {
       return React.createElement('div', { className: 'min-h-screen bg-white' },
@@ -307,7 +301,7 @@ class Storefront extends React.Component {
           ),
 
           // Store Info
-          React.createElement(StoreInfo, null)
+          product && React.createElement(StoreInfo, { store: product.store })
         )
       ),
 
@@ -316,7 +310,9 @@ class Storefront extends React.Component {
         React.createElement(StickyBottomBar, {
           onBuyClick: this.handleBuyNow.bind(this),
           onChatClick: function () { alert(t('storefront.chat.placeholder')); },
-          onWhatsAppClick: function () { window.open('https://wa.me/' + t('storefront.store.phone').replace(/\s/g, ''), '_blank'); },
+          onWhatsAppClick: whatsappNumber
+            ? function () { window.open('https://wa.me/' + whatsappNumber.replace(/\D/g, ''), '_blank'); }
+            : null,
         })
       )
     );

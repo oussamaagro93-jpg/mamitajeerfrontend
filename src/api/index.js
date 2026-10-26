@@ -47,6 +47,8 @@ export const orderAPI = {
   getById: (id) => api.get(`/orders/${id}`),
   create: (data) => api.post('/orders', data),
   updateStatus: (id, data) => api.put(`/orders/${id}/status`, data),
+  updatePayment: (id, data) => api.put(`/orders/${id}/payment`, data),
+  updateTracking: (id, data) => api.put(`/orders/${id}/tracking`, data),
   delete: (id) => api.delete(`/orders/${id}`),
   validateCoupon: (data) => api.post('/orders/validate-coupon', data),
 };
@@ -78,6 +80,11 @@ export const couponAPI = {
   create: (data) => api.post('/coupons', data),
   update: (id, data) => api.put(`/coupons/${id}`, data),
   delete: (id) => api.delete(`/coupons/${id}`),
+};
+
+export const storeProfileAPI = {
+  get: () => api.get('/store-profile'),
+  update: (data) => api.put('/store-profile', data),
 };
 
 export const userAPI = {
