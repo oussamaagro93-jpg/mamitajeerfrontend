@@ -6,6 +6,10 @@ class QuantitySelector extends React.Component {
     var t = this.props.t;
     var quantity = this.props.quantity || 1;
     var onChange = this.props.onChange || function () {};
+    var max = parseInt(this.props.max, 10);
+    var hasMax = Number.isInteger(max) && max > 0;
+    var atMax = hasMax && quantity >= max;
+    var unavailable = Number.isInteger(max) && max <= 0;
 
     var btnClass = 'w-10 h-10 bg-white rounded-xl flex items-center justify-center text-purple-700 font-bold text-xl shadow-sm ring-1 ring-purple-100 hover:bg-purple-600 hover:text-white hover:shadow-md active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-purple-700';
 
@@ -27,8 +31,9 @@ class QuantitySelector extends React.Component {
           }, quantity),
 
           React.createElement('button', {
-            onClick: function () { onChange(quantity + 1); },
+            onClick: function () { if (!atMax && !unavailable) onChange(quantity + 1); },
             className: btnClass,
+            disabled: atMax || unavailable,
             'aria-label': t('common.next'),
           }, '+')
         )

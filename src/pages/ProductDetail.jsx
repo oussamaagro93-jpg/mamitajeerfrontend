@@ -1,11 +1,14 @@
 import React from 'react';
 import { withTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { productAPI } from '../api';
 import MetaPixel from '../utils/pixel';
 import { getWhatsappNumber } from '../utils/storeContacts';
 import StorefrontHeader from '../components/storefront/StorefrontHeader';
 import ProductCard from '../components/storefront/ProductCard';
+import ProductTile from '../components/storefront/ProductTile';
+import AddToCartButton from '../components/storefront/AddToCartButton';
 import ProductOptions from '../components/storefront/ProductOptions';
 import PriceSection from '../components/storefront/PriceSection';
 import QuantitySelector from '../components/storefront/QuantitySelector';
@@ -35,7 +38,7 @@ class ProductDetail extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.match.params.slug !== this.props.match.params.slug) {
-      this.setState({ loading: true, notFound: false, product: null });
+      this.setState({ loading: true, notFound: false, product: null, quantity: 1, selectedOptions: {} });
       this.fetchProduct();
     }
   }
@@ -230,7 +233,21 @@ class ProductDetail extends React.Component {
 
                 React.createElement(QuantitySelector, {
                   quantity: this.state.quantity,
-                  onChange: function (val) { this.setState({ quantity: val }); }.bind(this),
+                  max: product.quantity,
+                  onChange: function (val) {
+                    var max = parseInt(product.quantity, 10);
+                    var next = parseInt(val, 10) || 1;
+                    if (Number.isInteger(max) && max > 0 && next > max) next = max;
+                    this.setState({ quantity: Math.max(1, next) });
+                  }.bind(this),
+                })
+              ),
+
+              product && React.createElement('div', { className: 'product-surface p-5 sm:p-6' },
+                React.createElement('p', { className: 'mb-3 text-sm text-gray-500' }, t('cart.addToCartHint')),
+                React.createElement(AddToCartButton, {
+                  product: product,
+                  quantity: this.state.quantity,
                 })
               )
             ),
@@ -261,37 +278,31 @@ class ProductDetail extends React.Component {
           ),
 
           related.length > 0 && React.createElement('section', { className: 'mt-10 lg:mt-14 product-reveal product-reveal-delay-3' },
-            React.createElement('div', { className: 'mb-5 flex items-center gap-3' },
-              React.createElement('span', { className: 'h-7 w-1.5 rounded-full bg-gradient-to-b from-[#5B21B6] to-[#6C3DF2]' }),
-              React.createElement('h2', { className: 'text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900' }, t('storefront.relatedProducts.title'))
+            React.createElement('div', { className: 'mb-5 flex flex-wrap items-center justify-between gap-3' },
+              React.createElement('div', { className: 'flex items-center gap-3' },
+                React.createElement('span', { className: 'h-7 w-1.5 rounded-full bg-gradient-to-b from-[#5B21B6] to-[#6C3DF2]' }),
+                React.createElement('div', null,
+                  React.createElement('h2', { className: 'text-xl sm:text-2xl font-extrabold tracking-tight text-gray-900' }, t('storefront.relatedProducts.title')),
+                  product.category && product.category.name
+                    ? React.createElement('p', { className: 'mt-1 text-sm text-gray-500' },
+                        t('storefront.relatedProducts.sameCategory', { category: product.category.name }))
+                    : null
+                )
+              ),
+              product.categoryId
+                ? React.createElement(Link, {
+                    to: '/categories/' + product.categoryId,
+                    className: 'inline-flex items-center rounded-xl border border-purple-100 bg-white px-4 py-2 text-sm font-semibold text-purple-700 shadow-sm transition-all hover:border-purple-300 hover:bg-purple-50',
+                  }, t('storefront.relatedProducts.seeAll'))
+                : null
             ),
             React.createElement('div', { className: 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5' },
               related.map(function (rp) {
-                var img = rp.image || (rp.images && rp.images.length > 0 ? rp.images[0].url : null);
-                return React.createElement('a', {
+                return React.createElement(ProductTile, {
                   key: rp.id,
-                  href: '/products/' + rp.slug,
-                  className: 'group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-purple-100/80 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl',
-                },
-                  React.createElement('div', { className: 'relative aspect-square overflow-hidden bg-gradient-to-br from-purple-50 via-white to-indigo-50' },
-                    img
-                      ? React.createElement('img', {
-                          src: img,
-                          alt: rp.name,
-                          className: 'h-full w-full object-cover transition-transform duration-500 group-hover:scale-105',
-                          loading: 'lazy',
-                        })
-                      : React.createElement('div', { className: 'flex h-full w-full items-center justify-center' },
-                          React.createElement('div', { className: 'w-12 h-12 bg-purple-100 rounded-full' })
-                        )
-                  ),
-                  React.createElement('div', { className: 'flex flex-1 flex-col gap-1 p-3 sm:p-4' },
-                    React.createElement('h3', { className: 'truncate text-sm font-semibold text-gray-900' }, rp.name),
-                    React.createElement('p', { className: 'text-sm font-bold text-purple-700' },
-                      parseFloat(rp.price).toFixed(2) + ' DA'
-                    )
-                  )
-                );
+                  product: rp,
+                  showCategory: false,
+                });
               })
             )
           )

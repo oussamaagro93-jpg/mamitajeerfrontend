@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withTranslation } from 'react-i18next';
-import { Bars3Icon, MagnifyingGlassIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, MagnifyingGlassIcon, GlobeAltIcon, ShoppingBagIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import { LANGUAGES, languageSlice } from '../../store/languageSlice';
+import CartContext from '../../context/CartContext';
 
 class StorefrontHeader extends React.Component {
   constructor(props) {
@@ -50,6 +51,27 @@ class StorefrontHeader extends React.Component {
         ),
 
         React.createElement('div', { className: 'flex items-center space-x-1' },
+          // Category browser
+          React.createElement('a', {
+            href: '/categories',
+            className: 'p-2 text-white hover:bg-white/10 rounded-full transition-colors active:scale-95',
+            'aria-label': t('shop.categoriesTitle'),
+          },
+            React.createElement(Squares2X2Icon, { className: 'w-6 h-6' })
+          ),
+
+          // Shopping cart
+          this.props.showCart !== false && React.createElement('a', {
+            href: '/cart',
+            className: 'relative p-2 text-white hover:bg-white/10 rounded-full transition-colors active:scale-95',
+            'aria-label': t('cart.title'),
+          },
+            React.createElement(ShoppingBagIcon, { className: 'w-6 h-6' }),
+            this.context && this.context.itemCount > 0 && React.createElement('span', {
+              className: 'absolute -top-0.5 -right-0.5 min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-white text-[#6C3DF2] text-[10px] font-extrabold flex items-center justify-center shadow-md',
+            }, this.context.itemCount > 99 ? '99+' : this.context.itemCount)
+          ),
+
           // Language Switcher
           React.createElement('div', { className: 'relative' },
             React.createElement('button', {
@@ -91,6 +113,8 @@ class StorefrontHeader extends React.Component {
 function mapStateToProps(state) {
   return { language: state.language.code };
 }
+
+StorefrontHeader.contextType = CartContext;
 
 var ConnectedHeader = connect(mapStateToProps)(StorefrontHeader);
 export default withTranslation()(ConnectedHeader);

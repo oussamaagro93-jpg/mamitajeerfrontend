@@ -50,8 +50,26 @@ class OrderSuccess extends React.Component {
     var discount = parseFloat(order.discountAmount) || 0;
     var shipping = parseFloat(order.shippingCost) || 0;
     var total = parseFloat(order.total) || 0;
+    var items = order.items || [];
 
     return React.createElement('div', { className: 'bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6 text-left' },
+      items.length > 0
+        ? React.createElement('div', { className: 'mb-3 space-y-2 border-b border-gray-200 pb-3' },
+            React.createElement('p', { className: 'text-xs font-semibold uppercase tracking-wider text-gray-400' }, t('checkout.orderedItems')),
+            items.map(function (item) {
+              var lineTotal = parseFloat(item.totalPrice);
+              if (!Number.isFinite(lineTotal)) lineTotal = (parseFloat(item.unitPrice) || 0) * (parseInt(item.quantity, 10) || 0);
+              return React.createElement('div', { key: item.id || item.productId, className: 'flex items-start justify-between gap-3 text-sm' },
+                React.createElement('div', { className: 'min-w-0' },
+                  React.createElement('p', { className: 'truncate font-medium text-gray-900' }, item.productName),
+                  React.createElement('p', { className: 'text-xs text-gray-500' },
+                    (parseInt(item.quantity, 10) || 0) + ' × ' + (parseFloat(item.unitPrice) || 0).toFixed(2) + ' DA')
+                ),
+                React.createElement('span', { className: 'whitespace-nowrap font-semibold text-gray-900' }, lineTotal.toFixed(2) + ' DA')
+              );
+            })
+          )
+        : null,
       React.createElement('div', { className: 'flex justify-between text-sm py-1' },
         React.createElement('span', { className: 'text-gray-600' }, t('checkout.subtotal')),
         React.createElement('span', { className: 'text-gray-900' }, subtotal.toFixed(2) + ' DA')
@@ -103,6 +121,37 @@ class OrderSuccess extends React.Component {
             : null,
 
           this.renderSummary(),
+
+          order
+            ? React.createElement('div', { className: 'bg-white border border-gray-200 rounded-xl p-4 mb-6 text-left text-sm' },
+                React.createElement('p', { className: 'mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400' }, t('checkout.deliveryDetails')),
+                order.guestName
+                  ? React.createElement('div', { className: 'flex justify-between gap-3 py-0.5' },
+                      React.createElement('span', { className: 'text-gray-500' }, t('checkout.fullName')),
+                      React.createElement('span', { className: 'text-right font-medium text-gray-900' }, order.guestName)
+                    )
+                  : null,
+                order.guestPhone
+                  ? React.createElement('div', { className: 'flex justify-between gap-3 py-0.5' },
+                      React.createElement('span', { className: 'text-gray-500' }, t('checkout.phone')),
+                      React.createElement('span', { dir: 'ltr', className: 'font-medium text-gray-900' }, order.guestPhone)
+                    )
+                  : null,
+                (order.guestWilaya || order.guestCity || order.guestAddress)
+                  ? React.createElement('div', { className: 'flex justify-between gap-3 py-0.5' },
+                      React.createElement('span', { className: 'text-gray-500' }, t('checkout.address')),
+                      React.createElement('span', { className: 'text-right font-medium text-gray-900' },
+                        [order.guestWilaya, order.guestCity, order.guestAddress].filter(Boolean).join(', '))
+                    )
+                  : null,
+                order.deliveryCompanyName
+                  ? React.createElement('div', { className: 'flex justify-between gap-3 py-0.5' },
+                      React.createElement('span', { className: 'text-gray-500' }, t('checkout.shipping')),
+                      React.createElement('span', { className: 'text-right font-medium text-gray-900' }, order.deliveryCompanyName)
+                    )
+                  : null
+              )
+            : null,
 
           React.createElement('div', { className: 'bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-left' },
             React.createElement('p', { className: 'text-sm text-amber-800 font-medium mb-1' }, t('checkout.success.whatsNext')),

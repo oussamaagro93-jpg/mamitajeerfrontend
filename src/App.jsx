@@ -11,6 +11,10 @@ import ResetPassword from './pages/ResetPassword';
 import Storefront from './pages/Storefront';
 import Landing from './pages/Landing';
 import ProductDetail from './pages/ProductDetail';
+import ShopCategories from './pages/ShopCategories';
+import ShopCategoryProducts from './pages/ShopCategoryProducts';
+import CartPage from './pages/CartPage';
+import CartCheckoutPage from './pages/CartCheckoutPage';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderComplete from './pages/OrderComplete';
 import Dashboard from './pages/Dashboard';
@@ -93,6 +97,12 @@ class App extends React.Component {
 
         // Public product detail page
         React.createElement(Route, { exact: true, path: '/products/:slug', component: ProductDetail }),
+
+        // Public category browsing and shopping cart
+        React.createElement(Route, { exact: true, path: '/categories', component: ShopCategories }),
+        React.createElement(Route, { exact: true, path: '/categories/:id', component: ShopCategoryProducts }),
+        React.createElement(Route, { exact: true, path: '/cart', component: CartPage }),
+        React.createElement(Route, { exact: true, path: '/checkout', component: CartCheckoutPage }),
 
         // Public order result pages
         React.createElement(Route, { exact: true, path: '/order-success/:orderNumber', component: OrderSuccess }),

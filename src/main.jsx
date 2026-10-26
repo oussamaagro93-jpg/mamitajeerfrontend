@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { store, persistor } from './store';
 import App from './App';
@@ -20,10 +21,12 @@ ReactDOM.render(
       React.createElement(PersistGate, { loading: null, persistor: persistor },
         React.createElement(BrowserRouter, null,
           React.createElement(AuthProvider, null,
-            React.createElement(ThemeProvider, null,
-              React.createElement(React.Fragment, null,
-                React.createElement(App, null),
-                React.createElement(Toast, null)
+            React.createElement(CartProvider, null,
+              React.createElement(ThemeProvider, null,
+                React.createElement(React.Fragment, null,
+                  React.createElement(App, null),
+                  React.createElement(Toast, null)
+                )
               )
             )
           )

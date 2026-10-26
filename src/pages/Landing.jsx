@@ -11,9 +11,12 @@ import {
   SunIcon,
   ChevronRightIcon,
   CheckIcon,
+  ShoppingBagIcon,
 } from '@heroicons/react/24/outline';
 import { ThemeContext } from '../context/ThemeContext';
 import { AuthContext } from '../context/AuthContext';
+import CartContext from '../context/CartContext';
+import AddToCartButton from '../components/storefront/AddToCartButton';
 
 var BRAND_COLOR = '#6C3DF2';
 
@@ -251,6 +254,24 @@ class Landing extends React.Component {
             React.createElement(
               'div',
               { className: 'flex items-center space-x-2' },
+              // Shopping cart
+              React.createElement(CartContext.Consumer, null, function (cart) {
+                var count = cart ? cart.itemCount : 0;
+                return React.createElement(
+                  'a',
+                  {
+                    href: '/cart',
+                    className: 'relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors',
+                    'aria-label': t('cart.title'),
+                  },
+                  React.createElement(ShoppingBagIcon, { className: 'w-5 h-5' }),
+                  count > 0
+                    ? React.createElement('span', {
+                        className: 'absolute -top-0.5 -right-0.5 min-w-[1.15rem] h-[1.15rem] px-1 rounded-full bg-[#6C3DF2] text-white text-[10px] font-extrabold flex items-center justify-center shadow-md',
+                      }, count > 99 ? '99+' : count)
+                    : null
+                );
+              }),
               // Theme Toggle
               React.createElement(
                 'button',
@@ -887,57 +908,65 @@ class Landing extends React.Component {
                       ? p.images[0].url
                       : null);
                   return React.createElement(
-                    Link,
+                    'div',
                     {
                       key: p.id,
-                      to: '/products/' + p.slug,
                       className:
-                        'group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all hover:-translate-y-1',
+                        'group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col',
                     },
                     React.createElement(
-                      'div',
-                      {
-                        className:
-                          'aspect-square bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden',
-                      },
-                      img
-                        ? React.createElement('img', {
-                            src: img,
-                            alt: p.name,
-                            className:
-                              'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300',
-                          })
-                        : React.createElement(
-                            'div',
-                            {
+                      Link,
+                      { to: '/products/' + p.slug, className: 'block' },
+                      React.createElement(
+                        'div',
+                        {
+                          className:
+                            'aspect-square bg-gray-50 dark:bg-gray-700 flex items-center justify-center overflow-hidden',
+                        },
+                        img
+                          ? React.createElement('img', {
+                              src: img,
+                              alt: p.name,
                               className:
-                                'w-16 h-16 rounded-full',
-                              style: {
-                                backgroundColor: BRAND_COLOR + '30',
-                              },
-                            }
-                          )
+                                'w-full h-full object-cover group-hover:scale-105 transition-transform duration-300',
+                            })
+                          : React.createElement(
+                              'div',
+                              {
+                                className:
+                                  'w-16 h-16 rounded-full',
+                                style: {
+                                  backgroundColor: BRAND_COLOR + '30',
+                                },
+                              }
+                            )
+                      ),
+                      React.createElement(
+                        'div',
+                        { className: 'px-4 pt-4' },
+                        React.createElement(
+                          'h3',
+                          {
+                            className:
+                              'font-semibold text-gray-900 dark:text-white text-sm truncate',
+                          },
+                          p.name
+                        ),
+                        React.createElement(
+                          'p',
+                          {
+                            className:
+                              'text-sm font-bold mt-1',
+                            style: { color: BRAND_COLOR },
+                          },
+                          parseFloat(p.price).toFixed(2) + ' DA'
+                        )
+                      )
                     ),
                     React.createElement(
                       'div',
-                      { className: 'p-4' },
-                      React.createElement(
-                        'h3',
-                        {
-                          className:
-                            'font-semibold text-gray-900 dark:text-white text-sm truncate',
-                        },
-                        p.name
-                      ),
-                      React.createElement(
-                        'p',
-                        {
-                          className:
-                            'text-sm font-bold mt-1',
-                          style: { color: BRAND_COLOR },
-                        },
-                        parseFloat(p.price).toFixed(2) + ' DA'
-                      )
+                      { className: 'p-4 pt-3' },
+                      React.createElement(AddToCartButton, { product: p })
                     )
                   );
                 })
@@ -948,7 +977,7 @@ class Landing extends React.Component {
                 React.createElement(
                   Link,
                   {
-                    to: '/register',
+                    to: '/categories',
                     className:
                       'inline-flex items-center px-6 py-3 text-sm font-semibold text-white rounded-xl transition-all hover:shadow-lg',
                     style: { backgroundColor: BRAND_COLOR },
